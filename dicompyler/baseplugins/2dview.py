@@ -137,6 +137,7 @@ class plugin2DView(wx.Panel):
             if (len(self.images) > 1):
                 self.imagenum = int(len(self.images)/2)
             image = self.images[self.imagenum-1]
+            print(dir(image))
             self.structurepixlut = image.GetPatientToPixelLUT()
             # Determine the default window and level of the series
             self.window, self.level = image.GetDefaultImageWindowLevel()
@@ -414,8 +415,9 @@ class plugin2DView(wx.Panel):
                 gc.SetPen(wx.Pen(wx.Colour(0, 0, 0)))
                 gc.DrawRectangle(0, 0, width, height)
 
-            image = guiutil.convert_pil_to_wx(
-                self.images[self.imagenum-1].GetImage(self.window, self.level))
+            image_pil = self.images[self.imagenum-1].GetImage(self.window, self.level)
+            image = guiutil.convert_pil_to_wx(image_pil)
+            
             bmp = wx.Bitmap(image)
             self.bwidth, self.bheight = image.GetSize()
 
@@ -496,6 +498,7 @@ class plugin2DView(wx.Panel):
                              'transx':transx,           # current x translation
                              'transy':transy,           # current y translation
                              'imdata':imdata,           # image data dictionary
+                             'image_pil': image_pil,        # image(PIL)
                              'patientpixlut':self.structurepixlut})
                                                         # pat to pixel coord LUT
 

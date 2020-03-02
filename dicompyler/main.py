@@ -28,6 +28,8 @@ from dicompyler import dicomgui, dvhdata
 from dicompylercore.dicomparser import DicomParser as dp
 from dicompyler import plugin, preferences
 
+from dicompyler.guihist import HistPanel
+
 class MainFrame(wx.Frame):
     def __init__(self, parent, id, title, res):
 
@@ -81,9 +83,9 @@ class MainFrame(wx.Frame):
         
         # Set the window size
         if guiutil.IsMac():
-            size=(900, 700)
+            size=(1200, 700)
         else:
-            size=(850, 625)
+            size=(1200, 700)
 
         wx.Frame.__init__(self, parent, id, title, pos=wx.DefaultPosition,
             size=size, style=wx.DEFAULT_FRAME_STYLE)
@@ -117,6 +119,18 @@ class MainFrame(wx.Frame):
         self.lblStructureMeanDose = XRCCTRL(self, 'lblStructureMeanDose')
         self.cclbStructures = guiutil.ColorCheckListBox(self.notebookTools, 'structure')
         self.cclbIsodoses = guiutil.ColorCheckListBox(self.notebookTools, 'isodose')
+        
+        """test code"""
+        self.sidePanel = XRCCTRL(self, 'sidePanel')
+        
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.sidePanel.SetSizer(sizer)
+
+        self.histPanel = HistPanel(self.sidePanel)
+        self.histPanel.plot_histogram_img(util.GetResourcePath("book.png"))
+        sizer.Add(self.histPanel, 0, wx.ALL | wx.EXPAND)
+        """test code"""
+
 
         # Modify the control size on Mac
         controls = [self.notebookTools, self.choiceStructure]
