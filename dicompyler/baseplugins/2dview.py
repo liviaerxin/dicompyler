@@ -482,6 +482,7 @@ class plugin2DView(wx.Panel):
                 gc.SetPen(wx.Pen(wx.Colour(0, 0, 0)))
                 gc.DrawRectangle(0, 0, width, height)
 
+            # save PIL image for message
             image_pil = self.images[self.imagenum - 1].GetImage(self.window, self.level)
             image = guiutil.convert_pil_to_wx(image_pil)
 
