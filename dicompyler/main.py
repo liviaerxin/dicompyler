@@ -29,8 +29,8 @@ from dicompyler import dicomgui, dvhdata
 from dicompylercore.dicomparser import DicomParser as dp
 from dicompyler import plugin, preferences
 
-from dicompyler.guihist import HistPanel
-
+from dicompyler.hist_panel import HistPanel
+from dicompyler.lesion_panel import LesionPanel
 
 class MainFrame(wx.Frame):
     def __init__(self, parent, id, title, res):
@@ -85,9 +85,9 @@ class MainFrame(wx.Frame):
 
         # Set the window size
         if guiutil.IsMac():
-            size = (1200, 700)
+            size = (1300, 900)
         else:
-            size = (1200, 700)
+            size = (1300, 900)
 
         wx.Frame.__init__(
             self,
@@ -129,16 +129,28 @@ class MainFrame(wx.Frame):
         self.cclbStructures = guiutil.ColorCheckListBox(self.notebookTools, "structure")
         self.cclbIsodoses = guiutil.ColorCheckListBox(self.notebookTools, "isodose")
 
-        """test code"""
-        self.sidePanel = XRCCTRL(self, "sidePanel")
+        """NotebookPlot
+            1. add histogram panel
+        """
 
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        self.sidePanel.SetSizer(sizer)
+        self.notebookPlot = XRCCTRL(self, "notebookPlot")
 
-        self.histPanel = HistPanel(self.sidePanel)
-        self.histPanel.plot_histogram_img(util.GetResourcePath("book.png"))
-        sizer.Add(self.histPanel, 0, wx.ALL | wx.EXPAND)
-        """test code"""
+        self.histPanel = HistPanel(self.notebookPlot)
+        #self.histPanel.plot_histogram_img(util.GetResourcePath("book.png"))
+        self.notebookPlot.AddPage(self.histPanel, "Histogram")
+        
+        """NotebookStatistics
+            1. add lesion statistics panel
+        """
+        self.notebookStatistics = XRCCTRL(self, "notebookStatistics")
+
+        self.lesionPanel = LesionPanel(self.notebookStatistics)
+        self.notebookStatistics.AddPage(self.lesionPanel, "Lesion")  
+
+        """Hide the left sizer"""
+        self.leftSizer = self.panelGeneral.GetSizer()
+        self.leftSizer.Hide(0)
+
 
         # Modify the control size on Mac
         controls = [self.notebookTools, self.choiceStructure]

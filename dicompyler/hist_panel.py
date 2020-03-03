@@ -14,21 +14,22 @@ from dicompyler import util
 
 from PIL import Image
 
-import logging, logging.handlers
+import logging
 
-logger = logging.getLogger("dicompyler.guihist")
+logger = logging.getLogger("dicompyler.hist_panel")
 
 
 class HistPanel(wx.Panel):
-    def __init__(self, parent, dpi=None, **kwargs):
-        wx.Panel.__init__(self, parent, **kwargs)
-        self.figure = Figure(figsize=(1, 4), dpi=dpi)
-        # self.axes = self.figure.add_subplot(111)
-        self.axes = self.figure.gca()
+    def __init__(self, parent, dpi=None, figsize=(2, 4), *args, **kwargs):
+        wx.Panel.__init__(self, parent, *args, **kwargs)
+        self.figure = Figure(figsize=figsize, dpi=dpi)
+        # Make one subplot
+        self.axes = self.figure.add_subplot(111)
+        # self.axes = self.figure.gca()
         self.canvas = FigureCanvas(self, -1, self.figure)
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.sizer.Add(self.canvas, 1, wx.EXPAND)
+        self.sizer.Add(self.canvas, 1, wx.EXPAND | wx.ALL)
         self.SetSizer(self.sizer)
 
         self._init_plot()
@@ -43,7 +44,7 @@ class HistPanel(wx.Panel):
 
     def _init_plot(self):
         # set title
-        self.figure.suptitle("Histogram", fontsize=10)
+        # self.figure.suptitle("Histogram", fontsize=10)
         # set label
         self.axes.set_xlabel("xlabel", fontsize=6)
         self.axes.set_ylabel("ylabel", fontsize=6)
@@ -98,34 +99,48 @@ class HistPanel(wx.Panel):
         print(f"OnSize: {e}")
 
 
-class CanvasFrame(wx.Frame):
-    def __init__(self):
-        wx.Frame.__init__(self, None, -1, "CanvasFrame", size=(550, 500))
+def run_HistPanel():
+    app = wx.App()
+    frame = wx.Frame(None, -1, "run HistPanel once", size=(550, 500))
 
-        self.sizer = wx.BoxSizer(wx.VERTICAL)
+    sizer = wx.BoxSizer(wx.VERTICAL)
 
-        self.histPanel = HistPanel(self)
+    # first
+    histPanel = HistPanel(frame)
 
-        # self.histPanel.plot_histogram_img("/Users/siyao/Documents/dicom/dicompyler/dicompyler/resources/book.png")
-        self.histPanel.plot_histogram(np.random.randint(0, 100, (500)))
-        # wx.CallLater(5000, self.histPanel.plot_histogram, np.random.randint(0, 100, (500)))
+    sizer.Add(histPanel, 1, wx.ALL | wx.EXPAND)
+    frame.SetSizer(sizer)
+    frame.Fit()
 
-        wx.CallLater(
-            2000,
-            self.histPanel.plot_histogram_img,
-            "/Users/siyao/Documents/dicom/dicompyler/dicompyler/resources/book.png",
-        )
+    frame.Show(True)
+    app.MainLoop()
 
-        self.sizer.Add(self.histPanel, 1, wx.TOP | wx.LEFT | wx.EXPAND)
 
-        # update the axes menu on the toolbar
-        self.SetSizer(self.sizer)
-        self.Fit()
+def run_and_update_HistPanel():
+    app = wx.App()
+    frame = wx.Frame(None, -1, "run and update HistPanel", size=(550, 500))
+
+    sizer = wx.BoxSizer(wx.VERTICAL)
+
+    histPanel = HistPanel(frame, figsize=(6, 6))
+
+    # first
+    histPanel.plot_histogram(np.random.randint(0, 100, (500)))
+    # second
+    wx.CallLater(
+        3000,
+        histPanel.plot_histogram_img,
+        "/Users/siyao/Documents/dicom/dicompyler/dicompyler/resources/book.png",
+    )
+    sizer.Add(histPanel, 1, wx.ALL | wx.EXPAND)
+    frame.SetSizer(sizer)
+    frame.Fit()
+
+    frame.Show(True)
+    app.MainLoop()
 
 
 if __name__ == "__main__":
     """Create the main window and insert the custom frame."""
-    app = wx.App()
-    frame = CanvasFrame()
-    frame.Show(True)
-    app.MainLoop()
+    # run_HistPanel()
+    run_and_update_HistPanel()

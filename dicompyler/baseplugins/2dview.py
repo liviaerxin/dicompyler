@@ -161,7 +161,7 @@ class plugin2DView(wx.Panel):
 
     def OnUpdatePatient(self, msg):
         """Update and load the patient data."""
-
+        print("bbbb")
         self.z = 0
         self.structurepixlut = ([], [])
         self.dosepixlut = ([], [])
