@@ -8,40 +8,43 @@
 #    available at https://github.com/bastula/dicompyler/
 
 import logging
-logger = logging.getLogger('dicompyler.plugin')
+
+logger = logging.getLogger("dicompyler.plugin")
 import imp, os
 import wx
 from wx.xrc import *
 from wx.lib.pubsub import pub
 from dicompyler import guiutil, util
 
+
 def import_plugins(userpath=None):
     """Find and import available plugins."""
 
     # Get the base plugin path
-    basepath = util.GetBasePluginsPath('')
+    basepath = util.GetBasePluginsPath("")
     # Get the user plugin path if it has not been set
-    if (userpath == None):
+    if userpath == None:
         datapath = guiutil.get_data_dir()
-        userpath = os.path.join(datapath, 'plugins')
+        userpath = os.path.join(datapath, "plugins")
     # Get the list of possible plugins from both paths
     possibleplugins = []
     for i in os.listdir(userpath):
-        possibleplugins.append({'plugin': i, 'location': 'user'})
+        possibleplugins.append({"plugin": i, "location": "user"})
     for i in os.listdir(basepath):
-        possibleplugins.append({'plugin': i, 'location': 'base'})
+        possibleplugins.append({"plugin": i, "location": "base"})
 
     modules = []
     plugins = []
     for p in possibleplugins:
-        module = p['plugin'].split('.')[0]
+        module = p["plugin"].split(".")[0]
         if module not in modules:
             if not ((module == "__init__") or (module == "")):
                 # only try to import the module once
                 modules.append(module)
                 try:
-                    f, filename, description = \
-                            imp.find_module(module, [userpath, basepath])
+                    f, filename, description = imp.find_module(
+                        module, [userpath, basepath]
+                    )
                 except ImportError:
                     # Not able to find module so pass
                     pass
@@ -52,25 +55,26 @@ def import_plugins(userpath=None):
                     except ImportError:
                         logger.exception("%s could not be loaded", module)
                     else:
-                        plugins.append({'plugin': m,
-                                        'location': p['location']})
+                        plugins.append({"plugin": m, "location": p["location"]})
                         logger.debug("%s loaded", module)
                     # If the module is a single file, close it
                     if not (description[2] == imp.PKG_DIRECTORY):
                         f.close()
     return plugins
 
+
 def PluginManager(parent, plugins, pluginsDisabled):
     """Prepare to show the plugin manager dialog."""
 
     # Load the XRC file for our gui resources
-    res = XmlResource(util.GetResourcePath('plugin.xrc'))
+    res = XmlResource(util.GetResourcePath("plugin.xrc"))
 
     dlgPluginManager = res.LoadDialog(parent, "PluginManagerDialog")
     dlgPluginManager.Init(plugins, pluginsDisabled)
 
     # Show the dialog
     dlgPluginManager.ShowModal()
+
 
 class PluginManagerDialog(wx.Dialog):
     """Manage the available plugins."""
@@ -86,49 +90,55 @@ class PluginManagerDialog(wx.Dialog):
             self.SetIcon(guiutil.get_icon())
 
         # Initialize controls
-        self.tcPlugins = XRCCTRL(self, 'tcPlugins')
-        self.panelTreeView = XRCCTRL(self, 'panelTreeView')
-        self.panelProperties = XRCCTRL(self, 'panelProperties')
-        self.lblName = XRCCTRL(self, 'lblName')
-        self.lblAuthor = XRCCTRL(self, 'lblAuthor')
-        self.lblPluginType = XRCCTRL(self, 'lblPluginType')
-        self.lblVersion = XRCCTRL(self, 'lblVersion')
-        self.lblVersionNumber = XRCCTRL(self, 'lblVersionNumber')
-        self.lblDescription = XRCCTRL(self, 'lblDescription')
-        self.checkEnabled = XRCCTRL(self, 'checkEnabled')
-        self.lblMessage = XRCCTRL(self, 'lblMessage')
-        self.btnGetMorePlugins = XRCCTRL(self, 'btnGetMorePlugins')
-        self.btnDeletePlugin = XRCCTRL(self, 'btnDeletePlugin')
+        self.tcPlugins = XRCCTRL(self, "tcPlugins")
+        self.panelTreeView = XRCCTRL(self, "panelTreeView")
+        self.panelProperties = XRCCTRL(self, "panelProperties")
+        self.lblName = XRCCTRL(self, "lblName")
+        self.lblAuthor = XRCCTRL(self, "lblAuthor")
+        self.lblPluginType = XRCCTRL(self, "lblPluginType")
+        self.lblVersion = XRCCTRL(self, "lblVersion")
+        self.lblVersionNumber = XRCCTRL(self, "lblVersionNumber")
+        self.lblDescription = XRCCTRL(self, "lblDescription")
+        self.checkEnabled = XRCCTRL(self, "checkEnabled")
+        self.lblMessage = XRCCTRL(self, "lblMessage")
+        self.btnGetMorePlugins = XRCCTRL(self, "btnGetMorePlugins")
+        self.btnDeletePlugin = XRCCTRL(self, "btnDeletePlugin")
 
         self.plugins = plugins
         self.pluginsDisabled = set(pluginsDisabled)
 
         # Bind interface events to the proper methods
-#        wx.EVT_BUTTON(self, XRCID('btnDeletePlugin'), self.DeletePlugin)
+        #        wx.EVT_BUTTON(self, XRCID('btnDeletePlugin'), self.DeletePlugin)
         # wx.EVT_CHECKBOX(self, XRCID('checkEnabled'), self.OnEnablePlugin)
-        self.Bind(wx.EVT_CHECKBOX, self.OnEnablePlugin, id=XRCID('checkEnabled'))
+        self.Bind(wx.EVT_CHECKBOX, self.OnEnablePlugin, id=XRCID("checkEnabled"))
         # wx.EVT_TREE_ITEM_ACTIVATED(self, XRCID('tcPlugins'), self.OnEnablePlugin)
-        self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.OnEnablePlugin, id=XRCID('tcPlugins'))
+        self.Bind(
+            wx.EVT_TREE_ITEM_ACTIVATED, self.OnEnablePlugin, id=XRCID("tcPlugins")
+        )
         # wx.EVT_TREE_SEL_CHANGED(self, XRCID('tcPlugins'), self.OnSelectTreeItem)
-        self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectTreeItem, id=XRCID('tcPlugins'))
+        self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectTreeItem, id=XRCID("tcPlugins"))
         # wx.EVT_TREE_SEL_CHANGING(self, XRCID('tcPlugins'), self.OnSelectRootItem)
-        self.Bind(wx.EVT_TREE_SEL_CHANGING, self.OnSelectRootItem, id=XRCID('tcPlugins'))
+        self.Bind(
+            wx.EVT_TREE_SEL_CHANGING, self.OnSelectRootItem, id=XRCID("tcPlugins")
+        )
 
         # Modify the control and font size as needed
         font = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
         if guiutil.IsMac():
-            children = list(self.Children) + \
-                        list(self.panelTreeView.Children) + \
-                        list(self.panelProperties.Children)
+            children = (
+                list(self.Children)
+                + list(self.panelTreeView.Children)
+                + list(self.panelProperties.Children)
+            )
             for control in children:
                 control.SetFont(font)
                 control.SetWindowVariant(wx.WINDOW_VARIANT_SMALL)
-            XRCCTRL(self, 'wxID_OK').SetWindowVariant(wx.WINDOW_VARIANT_NORMAL)
+            XRCCTRL(self, "wxID_OK").SetWindowVariant(wx.WINDOW_VARIANT_NORMAL)
         font.SetWeight(wx.FONTWEIGHT_BOLD)
         if guiutil.IsMSWindows():
             self.tcPlugins.SetPosition((0, 3))
             self.panelTreeView.SetWindowStyle(wx.STATIC_BORDER)
-        if (guiutil.IsMac() or guiutil.IsGtk()):
+        if guiutil.IsMac() or guiutil.IsGtk():
             self.tcPlugins.SetPosition((-30, 0))
             self.panelTreeView.SetWindowStyle(wx.SUNKEN_BORDER)
         self.lblName.SetFont(font)
@@ -143,24 +153,15 @@ class PluginManagerDialog(wx.Dialog):
 
         iSize = (16, 16)
         iList = wx.ImageList(iSize[0], iSize[1])
+        iList.Add(wx.Bitmap(util.GetResourcePath("bricks.png"), wx.BITMAP_TYPE_PNG))
+        iList.Add(wx.Bitmap(util.GetResourcePath("plugin.png"), wx.BITMAP_TYPE_PNG))
         iList.Add(
-            wx.Bitmap(
-                util.GetResourcePath('bricks.png'),
-                wx.BITMAP_TYPE_PNG))
-        iList.Add(
-            wx.Bitmap(
-                util.GetResourcePath('plugin.png'),
-                wx.BITMAP_TYPE_PNG))
-        iList.Add(
-            wx.Bitmap(
-                util.GetResourcePath('plugin_disabled.png'),
-                wx.BITMAP_TYPE_PNG))
+            wx.Bitmap(util.GetResourcePath("plugin_disabled.png"), wx.BITMAP_TYPE_PNG)
+        )
         self.tcPlugins.AssignImageList(iList)
-        self.root = self.tcPlugins.AddRoot('Plugins')
-        self.baseroot = self.tcPlugins.AppendItem(
-                        self.root, "Built-In Plugins", 0)
-        self.userroot = self.tcPlugins.AppendItem(
-                        self.root, "User Plugins", 0)
+        self.root = self.tcPlugins.AddRoot("Plugins")
+        self.baseroot = self.tcPlugins.AppendItem(self.root, "Built-In Plugins", 0)
+        self.userroot = self.tcPlugins.AppendItem(self.root, "User Plugins", 0)
 
         font = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
         font.SetWeight(wx.FONTWEIGHT_BOLD)
@@ -174,18 +175,18 @@ class PluginManagerDialog(wx.Dialog):
         for n, plugin in enumerate(self.plugins):
             # Skip plugin if it doesn't contain the required dictionary
             # or actually is a proper Python module
-            p = plugin['plugin']
-            if not hasattr(p, 'pluginProperties'):
+            p = plugin["plugin"]
+            if not hasattr(p, "pluginProperties"):
                 continue
             props = p.pluginProperties()
             root = self.userroot
-            if (plugin['location'] == 'base'):
+            if plugin["location"] == "base":
                 root = self.baseroot
             else:
                 root = self.userroot
-            i = self.tcPlugins.AppendItem(root, props['name'], 1)
+            i = self.tcPlugins.AppendItem(root, props["name"], 1)
 
-            if (p.__name__ in self.pluginsDisabled):
+            if p.__name__ in self.pluginsDisabled:
                 self.tcPlugins.SetItemImage(i, 2)
                 self.tcPlugins.SetItemTextColour(i, wx.Colour(169, 169, 169))
 
@@ -195,30 +196,30 @@ class PluginManagerDialog(wx.Dialog):
         self.Bind(
             wx.EVT_TREE_ITEM_COLLAPSING,
             self.OnExpandCollapseTree,
-            id=XRCID('tcPlugins'))
+            id=XRCID("tcPlugins"),
+        )
         self.Bind(
-            wx.EVT_TREE_ITEM_EXPANDING,
-            self.OnExpandCollapseTree,
-            id=XRCID('tcPlugins'))
+            wx.EVT_TREE_ITEM_EXPANDING, self.OnExpandCollapseTree, id=XRCID("tcPlugins")
+        )
 
     def OnSelectTreeItem(self, evt):
         """Update the interface when the selected item has changed."""
 
         item = evt.GetItem()
         n = self.tcPlugins.GetItemData(item)
-        if (n == None):
+        if n == None:
             self.panelProperties.Hide()
             return
         self.panelProperties.Show()
         plugin = self.plugins[n]
-        p = plugin['plugin']
+        p = plugin["plugin"]
         props = p.pluginProperties()
-        self.lblName.SetLabel(props['name'])
-        self.lblAuthor.SetLabel(props['author'].replace('&', '&&'))
-        self.lblVersionNumber.SetLabel(str(props['version']))
-        ptype = props['plugin_type']
+        self.lblName.SetLabel(props["name"])
+        self.lblAuthor.SetLabel(props["author"].replace("&", "&&"))
+        self.lblVersionNumber.SetLabel(str(props["version"]))
+        ptype = props["plugin_type"]
         self.lblPluginType.SetLabel(ptype[0].capitalize() + ptype[1:])
-        self.lblDescription.SetLabel(props['description'].replace('&', '&&'))
+        self.lblDescription.SetLabel(props["description"].replace("&", "&&"))
 
         self.checkEnabled.SetValue(not (p.__name__ in self.pluginsDisabled))
 
@@ -230,7 +231,7 @@ class PluginManagerDialog(wx.Dialog):
 
         item = evt.GetItem()
         n = self.tcPlugins.GetItemData(item)
-        if (n == None):
+        if n == None:
             evt.Veto()
 
     def OnExpandCollapseTree(self, evt):
@@ -244,11 +245,11 @@ class PluginManagerDialog(wx.Dialog):
         item = self.tcPlugins.GetSelection()
         n = self.tcPlugins.GetItemData(item)
         plugin = self.plugins[n]
-        p = plugin['plugin']
+        p = plugin["plugin"]
 
         # Set the checkbox to the appropriate state if the event
         # comes from the treeview
-        if (evt.EventType == wx.EVT_TREE_ITEM_ACTIVATED.typeId):
+        if evt.EventType == wx.EVT_TREE_ITEM_ACTIVATED.typeId:
             self.checkEnabled.SetValue(not self.checkEnabled.IsChecked())
 
         if self.checkEnabled.IsChecked():
@@ -262,5 +263,7 @@ class PluginManagerDialog(wx.Dialog):
             self.pluginsDisabled.add(p.__name__)
             logger.debug("%s disabled", p.__name__)
 
-        pub.sendMessage('preferences.updated.value',
-                msg={'general.plugins.disabled_list': list(self.pluginsDisabled)})
+        pub.sendMessage(
+            "preferences.updated.value",
+            msg={"general.plugins.disabled_list": list(self.pluginsDisabled)},
+        )

@@ -7,10 +7,11 @@ resources_dir = os.path.join(dir, "resources")
 
 main_xrc_file = os.path.join(resources_dir, "main.xrc")
 
+
 class PanelGeneral(wx.Panel):
     def __init__(self, parent, *args, **kw):
         wx.Panel.__init__(self, parent)
-        
+
         res = xrc.XmlResource(main_xrc_file)
         res.LoadPanel(self, parent, "panelGeneral")
 
@@ -21,6 +22,7 @@ class PanelWelcome(wx.Panel):
         res = xrc.XmlResource(main_xrc_file)
         res.LoadPanel(self, parent, "panelWelcome")
 
+
 class PanelTest(wx.Panel):
     def __init__(self, parent, *args, **kw):
         wx.Panel.__init__(self, parent)
@@ -28,7 +30,7 @@ class PanelTest(wx.Panel):
         res.LoadPanel(self, parent, "MyPanel9")
         self.panel1 = xrc.XRCCTRL(self, "m_panel2")
         self.notebook: wx.Notebook = xrc.XRCCTRL(self, "m_notebook5")
-        #self.notebook.DeletePage(0)
+        # self.notebook.DeletePage(0)
 
 
 class TestFrame(wx.Frame):
@@ -36,10 +38,11 @@ class TestFrame(wx.Frame):
         wx.Frame.__init__(self, parent, *args, **kw)
 
 
-
 """
 Test Show
 """
+
+
 def show_PanelGeneral():
     frame = wx.Frame(None)
 
@@ -51,15 +54,16 @@ def show_PanelGeneral():
 def show_PanelWelcome():
     frame = wx.Frame(None)
 
-    #panelWelcome = xrc.XmlResource(main_xrc_file).LoadPanel(frame, 'panelWelcome')
+    # panelWelcome = xrc.XmlResource(main_xrc_file).LoadPanel(frame, 'panelWelcome')
     panelWelcome = PanelWelcome(frame)
-        
+
     frame.Show()
+
 
 if __name__ == "__main__":
     app = wx.App()
-    #show_PanelGeneral()
-    #show_PanelWelcome()
+    # show_PanelGeneral()
+    # show_PanelWelcome()
 
     frame = wx.Frame(None)
 
@@ -68,4 +72,3 @@ if __name__ == "__main__":
     frame.Show()
 
     app.MainLoop()
-    
