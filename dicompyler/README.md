@@ -3,23 +3,30 @@
 ## Feature
 
 1. Panel to show the histogram graph of each image in 2D-View.
-2. Panel to show the lesion list of each series
+2. Panel to show the lesion statistics list of each series
 
 ## TODO Works
 
-- [x] replace `panelGeneral` with our algorithm output
+- [x] replace `panelGeneral` with our algorithm output  
   hide the left sizer is ok?
-- add background thread to `astri_leision.py`
-- `sendMessage()` from `astri_leision.py` for histogram
+- add background thread to `astri_leision.py`  
+- `sendMessage()` from `astri_leision.py` for histogram  
   better send from thread
-- remove `dicompyler/baseplugins/{dvh,quickopen}.*`
+- remove `dicompyler/baseplugins/{dvh,quickopen}.*`  
 - also check code of `https://github.com/dicompyler/dicompyler-core`  
   DICOM parsing (with `pydicom`) done here
-- are we using [wxWidgets/Phoenix](https://github.com/wxWidgets/Phoenix/)? (Yes, after wxPython4.0.0a2 version, Phoenix is the improved next-generation wxPython)
-
-- add overlay to `2dview`
+- [x] are we using [wxWidgets/Phoenix](https://github.com/wxWidgets/Phoenix/)? (Yes, after wxPython4.0.0a2 version, Phoenix is the improved next-generation wxPython)  
+- add overlay to `2dview`  
 - add WC/WW to `2dview` (toolbar button/right click drag/Control drag?)  
   https://www.radiantviewer.com/dicom-viewer-manual/change_brightness_contrast.html
+
+- [x]histogram  
+  - [x]shown before opening series
+  - [x]larger bin to make it a bar chart
+  - [x]show 2 back to back
+
+- need to show Chinese?
+   config matplot Chinese font setting, title
 
 ## dicomplyer study
 
@@ -34,10 +41,6 @@
   image.ImagePositionPatient, image.InstanceNumber, image.AcquisitionNumber
   ```
 
-- histogram
-  - shown before opening series
-  - larger bin to make it a bar chart
-  - show 2 back to back
 
 ## Workarounds
 
