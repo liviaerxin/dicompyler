@@ -12,7 +12,7 @@
 
 import wx
 from wx.xrc import XmlResource, XRCCTRL, XRCID
-from wx.lib.pubsub import pub
+from pubsub import pub
 from dicompyler import guiutil, util
 from dicompyler import guidvh
 import numpy as np
@@ -27,7 +27,8 @@ def pluginProperties():
     props["author"] = "Aditya Panchal"
     props["version"] = "0.5.0"
     props["plugin_type"] = "main"
-    props["plugin_version"] = 1
+    # props["plugin_version"] = 1  
+    props["plugin_version"] = 0.1 # not qualified version, so that the app will not load this plugin
     props["min_dicom"] = ["rtss", "rtdose"]
     props["recommended_dicom"] = ["rtss", "rtdose", "rtplan"]
 

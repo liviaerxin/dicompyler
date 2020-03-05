@@ -1,6 +1,6 @@
 import wx
 import wx.lib.mixins.listctrl
-from wx.lib.pubsub import pub
+from pubsub import pub
 
 from random import randint
 

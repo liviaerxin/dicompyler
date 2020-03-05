@@ -1,6 +1,6 @@
 import wx
 import wx.lib.mixins.inspection as wit
-from wx.lib.pubsub import pub
+from pubsub import pub
 
 import matplotlib.image as mpimg
 from matplotlib.backends.backend_wxagg import (

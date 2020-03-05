@@ -10,7 +10,7 @@
 
 import wx
 from wx.xrc import XmlResource, XRCCTRL, XRCID
-from wx.lib.pubsub import pub
+from pubsub import pub
 import os, threading
 from dicompyler import guiutil, util
 
@@ -25,7 +25,8 @@ def pluginProperties():
     props["author"] = "Aditya Panchal"
     props["version"] = "0.5.0"
     props["plugin_type"] = "export"
-    props["plugin_version"] = 1
+    # props["plugin_version"] = 1
+    props["plugin_version"] = 0.1 # not qualified version, so that the app will not load this plugin
     props["min_dicom"] = []
     props["recommended_dicom"] = ["images", "rtss", "rtplan", "rtdose"]
 

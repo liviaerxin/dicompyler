@@ -12,7 +12,7 @@ import logging
 
 logger = logging.getLogger("dicompyler.quickimport")
 import wx
-from wx.lib.pubsub import pub
+from pubsub import pub
 from dicompylercore import dicomparser
 from dicompyler import util
 
@@ -27,7 +27,8 @@ def pluginProperties():
     props["author"] = "Aditya Panchal"
     props["version"] = "0.5.0"
     props["plugin_type"] = "import"
-    props["plugin_version"] = 1
+    # props["plugin_version"] = 1
+    props["plugin_version"] = 0.1 # not qualified version, so that the app will not load this plugin
     props["min_dicom"] = []
 
     return props

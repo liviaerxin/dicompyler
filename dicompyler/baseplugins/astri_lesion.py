@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger("dicompyler.astri_leision")
 
 import wx
-from wx.lib.pubsub import pub
+from pubsub import pub
 import pprint
 
 
