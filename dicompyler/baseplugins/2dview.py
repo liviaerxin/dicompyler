@@ -161,7 +161,6 @@ class plugin2DView(wx.Panel):
 
     def OnUpdatePatient(self, msg):
         """Update and load the patient data."""
-        print("bbbb")
         self.z = 0
         self.structurepixlut = ([], [])
         self.dosepixlut = ([], [])
@@ -172,7 +171,6 @@ class plugin2DView(wx.Panel):
             if len(self.images) > 1:
                 self.imagenum = int(len(self.images) / 2)
             image = self.images[self.imagenum - 1]
-            print(dir(image))
             self.structurepixlut = image.GetPatientToPixelLUT()
             # Determine the default window and level of the series
             self.window, self.level = image.GetDefaultImageWindowLevel()

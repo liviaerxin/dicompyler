@@ -15,6 +15,7 @@ logger = logging.getLogger("dicompyler")
 logger.setLevel(logging.DEBUG)
 
 import os, threading
+import time
 import sys, traceback
 import wx
 from wx.xrc import *
@@ -30,7 +31,7 @@ from dicompylercore.dicomparser import DicomParser as dp
 from dicompyler import plugin, preferences
 
 from dicompyler.hist_panel import HistPanel
-from dicompyler.lesion_panel import LesionPanel
+from dicompyler.lesion_statistics_panel import LesionStatisticsPanel
 
 class MainFrame(wx.Frame):
     def __init__(self, parent, id, title, res):
@@ -144,8 +145,8 @@ class MainFrame(wx.Frame):
         """
         self.notebookStatistics = XRCCTRL(self, "notebookStatistics")
 
-        self.lesionPanel = LesionPanel(self.notebookStatistics)
-        self.notebookStatistics.AddPage(self.lesionPanel, "Lesion")  
+        self.lesionStatisticsPanel = LesionStatisticsPanel(self.notebookStatistics)
+        self.notebookStatistics.AddPage(self.lesionStatisticsPanel, "Lesion")  
 
         """Hide the left sizer"""
         self.leftSizer = self.panelGeneral.GetSizer()
@@ -576,6 +577,8 @@ class MainFrame(wx.Frame):
                     i += 1
             for key, dvh in patient["dvhs"].items():
                 dvh.rx_dose = patient["plan"]["rxdose"] / 100
+
+        #time.sleep(2) # for test
         wx.CallAfter(progressFunc, 100, 100, "Done")
         wx.CallAfter(updateFunc, patient)
 

@@ -148,6 +148,7 @@ class HistPanel(wx.Panel):
         self.toolbar.update()
 
     def OnUpdateHistogram(self, msg):
+        print(f"Update Patient Histogram Panel")
         """Update Histogram When 2D View Image Updated."""
         # logger.info(msg)
         image: Image.Image = msg["image_pil"]

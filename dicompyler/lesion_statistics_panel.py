@@ -43,7 +43,7 @@ class SortedListCtrl(
         return self
 
 
-class LesionPanel(wx.Panel):
+class LesionStatisticsPanel(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
         wx.Panel.__init__(self, parent, *args, **kwargs)
 
@@ -63,7 +63,7 @@ class LesionPanel(wx.Panel):
         self.SetSizer(hbox)
 
         # Set up pubsub
-        pub.subscribe(self.OnUpdateLesion, "patient.updated.parsed_data")
+        pub.subscribe(self.OnUpdateLesion, "patient.updated.lesion_analysis")
 
     def update_lesion_list(self, data):
 
@@ -80,12 +80,11 @@ class LesionPanel(wx.Panel):
             idx += 1
 
     def OnUpdateLesion(self, msg):
-        print("update patient's lesion")
-        #TODO: real data instead of mock data
+        print("Update Patient Lesion Statistics Panel")
+        # TODO: real data instead of mock data
 
         data = [mock_data, mock_data1][randint(0, 1)]
         self.update_lesion_list(data)
-
 
 
 def run_LesionPanel():

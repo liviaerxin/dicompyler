@@ -4,34 +4,38 @@
 
 1. Panel to show the histogram graph of each image in 2D-View.
 2. Panel to show the lesion statistics list of each series.
+3. Lesion analysis
 
 ## TODO Works
 
-- [x] replace `panelGeneral` with our algorithm output
+- [x] replace `panelGeneral` with our algorithm output  
   hide the left sizer to not show `dose` and `structure`
 
-- add background thread to `astri_leision.py`
+- [x] add background thread to `astri_lesion.py`  
+   mock lesion analyzing function with `time.sleep`. For printing progress, the mock suggests the alogrithm can process one file. If the alogrithm processes a list of files and it also can print progress, the function should comply with some rules, such as yielding results, ...etc.
 
-- `sendMessage()` from `astri_leision.py` for histogram
-  better send from thread
+- `sendMessage("patient.updated.lesion_analysis", msg="")` from `astri_lesion.py` for lesion_statistics update  
+  send after `alogrithm` function processing
 
-- [x] remove `dicompyler/baseplugins/{dvh,quickopen,anonymize}.*` plugins
+- histogram is based on each image from `2-D Viewer` or the once result from `Lesion Analysis`?  
+  
+- [x] remove `dicompyler/baseplugins/{dvh,quickopen,anonymize}.*` plugins  
   change the `plugin_version` to not load them
 
-- also check code of `https://github.com/dicompyler/dicompyler-core` DICOM parsing (with `pydicom`) done here
+- also check code of `https://github.com/dicompyler/dicompyler-core` DICOM parsing (with `pydicom`) done here  
 
-- [x] are we using [wxWidgets/Phoenix](https://github.com/wxWidgets/Phoenix/)? (Yes, after wxPython4.0.0a2 version, Phoenix is the improved next-generation wxPython)
+- [x] are we using [wxWidgets/Phoenix](https://github.com/wxWidgets/Phoenix/)? (Yes, after wxPython4.0.0a2 version, Phoenix is the improved next-generation wxPython)  
 
-- add overlay to `2dview`
+- add overlay to `2dview`  
 
 - add WC/WW to `2dview` (toolbar button/right click drag/Control drag?) <https://www.radiantviewer.com/dicom-viewer-manual/change_brightness_contrast.html>
 
-- [x] histogram
+- [x] histogram  
   - shown before opening series
   - larger bin to make it a bar chart
   - show 2 back to back
 
-- need to show Chinese? config matplot with Chinese font setting, title
+- need to show Chinese? config matplot with Chinese font setting, title  
 
 ## dicomplyer study
 
@@ -46,7 +50,7 @@
 
 ## Workarounds
 
-1. wx.StaticText set `wrap` with -1 to disable wrapping
+1. wx.StaticText set `wrap` with -1 to disable wrapping  
 2. different derived class from `XRC` for wx.Frame and wx.Panel  
 
    wx.Panel,
@@ -69,10 +73,10 @@
          res.LoadFrame(self, parent, "frameWelcome")
    ```
 
-3. vscode stuck in `analyzing in background`
+3. vscode stuck in `analyzing in background`  
    set {"python.jediEnabled": true}
 
-4. embed matplotlib in wxPython
+4. embed matplotlib in wxPython  
    You have a few different options available to you for embedding matplotlib in a wxPython application
 
    1. Embed one of the wxPython backend widgets (which subclass wx.Panel) directly and draw plots on it using matplotlib's object-oriented API. This approach is demonstrated by some of the examples embedding_in_wx*.py
@@ -85,7 +89,7 @@
 
    Each of these approaches has different benefits and drawbacks, so I encourage you to evaluate each of them and select the one that best meets your needs.
 
-5. when debug python code, error `ImportError: attempted relative import with no known parent package`
+5. when debug python code, error `ImportError: attempted relative import with no known parent package`  
 
    run as module
 
@@ -95,7 +99,7 @@
 
    [ImportError: attempted relative import with no known parent package](https://napuzba.com/a/import-error-relative-no-parent/p4)
 
-6. refresh/redraw a mathplotlib figure in a wxpython panel
+6. refresh/redraw a mathplotlib figure in a wxpython panel  
 
    ```python
    class HistPanel(wx.Panel):
@@ -132,7 +136,7 @@
    self.canvas.Refresh()
    ```
 
-7. convert a PIL Image into a numpy array
+7. convert a PIL Image into a numpy array  
 
    ```python
    from PIL import Image

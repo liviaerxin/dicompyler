@@ -1,18 +1,23 @@
 import logging
 
-logger = logging.getLogger("dicompyler.astri_leision")
+logger = logging.getLogger("dicompyler.plugins.astri_leision")
 
 import wx
 from pubsub import pub
 import pprint
+import os, threading
+from dicompyler import guiutil, util
+import pydicom
+from typing import List
+import time
 
 
 def pluginProperties():
     """Properties of the plugin."""
 
     props = {}
-    props["name"] = "Leision Analysis"
-    props["description"] = "Leision Analysis"
+    props["name"] = "Lesion Analysis"
+    props["description"] = "Lesion Analysis"
     props["author"] = "ASTRI"
     props["version"] = 0.1
     props["plugin_type"] = "main"
@@ -25,7 +30,7 @@ def pluginProperties():
 
 def pluginLoader(parent):
     """Function to load the plugin."""
-    print("Leision Analysis Loaded")
+    print("Lesion Analysis Plugin Loaded")
     panelTest = pluginTest(parent)
     return panelTest
 
@@ -35,6 +40,8 @@ class pluginTest(wx.Panel):
 
     def __init__(self, parent):
         wx.Panel.__init__(self, parent, -1)
+
+        # Initialize variables
 
         # Initialize the panel controls
         # self.patname = wx.StaticText(self, -1, "N/A", style=wx.ALIGN_CENTRE)
@@ -52,16 +59,70 @@ class pluginTest(wx.Panel):
 
     def OnUpdatePatient(self, msg):
         """Update and load the patient data."""
-
-        logger.debug("msg.keys(%s), class(%s)", list(msg.keys()), type(msg).__name__)
-        self.patname.AppendText(str(msg.keys()) + "\n")
+        # self.patname.AppendText(str(msg.keys()) + "\n")
+        files: List[str] = []
         if "images" in msg:
             # raw_data
-            image = msg["images"][0]
-            logger.debug("class(%s)", type(image).__name__)
-            logger.debug("class(%s)", type(image).__name__)
-            self.patname.AppendText(pprint.pformat(image) + "\n")
+            images = msg["images"]
+            for image in images:
+                if isinstance(image, pydicom.dataset.FileDataset):
+                    files.append(image.filename)
+                else:
+                    print(f"unable to process the image: {type(image)}")
 
-        # Get the RT Structure Set DICOM dataset
-        # rtss = msg.data["rtss"]
-        # self.patname.SetLabel(rtss.PatientName)
+        self.OnUpdateAnalysis(files)
+
+        pub.unsubscribe(self.OnUpdatePatient, "patient.updated.raw_data")
+
+    def OnUpdateAnalysis(self, files: List[str]):
+        """Analyze the lesion with given DICOM files
+        
+        Arguments:
+            files {List[str]} -- a list of DICOM files, each value is expected to be the filepath
+        """
+
+        # Initialize the progress dialog
+        dlgProgress = guiutil.get_progress_dialog(
+            wx.GetApp().GetTopWindow(), "Aanlyzing Lesion..."
+        )
+        # Set up the queue so that the thread knows which item was added
+        # self.queue = queue.Queue()
+        # Initialize and start the background analyzing thread
+        self.t = threading.Thread(
+            target=self.analyze_files_thread,
+            args=(files, dlgProgress.OnUpdateProgress),
+        )
+        self.t.start()
+        # Show the progress dialog
+        dlgProgress.ShowModal()
+        dlgProgress.Destroy()
+
+    def OnDestroy(self, evt):
+        """Unbind to all events before the plugin is destroyed."""
+
+        pub.unsubscribe(self.OnUpdatePatient, "patient.updated.raw_data")
+
+    def mock_analyze_file(self, file: str):
+        """mock analyze algorithm, process one file
+        
+        Arguments:
+            file {str} -- [description]
+        """
+        time.sleep(0.01)
+
+    def analyze_files_thread(self, files: List[str], progressFunc):
+        length = len(files)
+
+        for i, file in enumerate(files):
+            wx.CallAfter(progressFunc, i, length, "Aanlyzing Lesion...")
+
+            # TODO: replace with real analyzing algorithm
+            self.mock_analyze_file(file)
+
+        wx.CallAfter(progressFunc, length, length, "Done")
+
+        #
+        pub.sendMessage(
+            "patient.updated.lesion_analysis", msg={"result": "lesion_analysis_result"}
+        )
+
