@@ -8,6 +8,9 @@
 #    available at https://github.com/bastula/dicompyler/
 #
 
+import logging
+
+logger = logging.getLogger("dicompyler.2dview")
 import wx
 from wx.xrc import XmlResource, XRCCTRL, XRCID
 from pubsub import pub
@@ -15,6 +18,18 @@ from matplotlib import _cntr as cntr
 from matplotlib import __version__ as mplversion
 import numpy as np
 from dicompyler import guiutil, util
+import dicompylercore
+from PIL import Image
+
+
+def generate_random_overlay(size, threshold=0.7):
+    """return a random image of size with patches of grayscale """
+    assert size[0] % 16 == 0 and size[1] % 16 == 0
+    qsize = (size[0] // 16, size[1] // 16)  # patch size = 1/16 of size
+    thresholding = np.vectorize(lambda x: 255 * x if x > threshold else 0)
+    Z = thresholding(np.random.random(qsize)).astype(np.uint8)
+    im = Image.fromarray(Z, mode="L").resize(size, resample=Image.NEAREST)
+    return im
 
 
 def pluginProperties():
@@ -480,9 +495,17 @@ class plugin2DView(wx.Panel):
                 gc.SetPen(wx.Pen(wx.Colour(0, 0, 0)))
                 gc.DrawRectangle(0, 0, width, height)
 
-            # save PIL image for message
+            # save PIL handle for message
             image_pil = self.images[self.imagenum - 1].GetImage(self.window, self.level)
-            image = guiutil.convert_pil_to_wx(image_pil)
+            ## add overlay
+            overlay_mask = generate_random_overlay(
+                (image_pil.size[0], image_pil.size[1])
+            )
+            overlayed = Image.composite(
+                (255, 0, 0), image_pil.convert("RGBA"), mask=overlay_mask
+            )
+            ## add overlay
+            image = guiutil.convert_pil_to_wx(overlayed)
 
             bmp = wx.Bitmap(image)
             self.bwidth, self.bheight = image.GetSize()
