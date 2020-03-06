@@ -30,13 +30,22 @@ hist_params = {
 }
 
 
-def pyramid_plot(figure:Figure, ylabels: List, xticks: List, data_left: List, title_left: str, data_right: List, title_right: str="", **kwargs):
-    if(figure is None):
+def pyramid_plot(
+    figure: Figure,
+    ylabels: List,
+    xticks: List,
+    data_left: List,
+    title_left: str,
+    data_right: List,
+    title_right: str = "",
+    **kwargs,
+):
+    if figure is None:
         return None
 
     y_pos = np.arange(len(ylabels))
-    #empty_ticks = tuple('' for n in ylabels)
-    
+    # empty_ticks = tuple('' for n in ylabels)
+
     height = 1
     axes_left = figure.add_subplot(121)
     axes_left.barh(y_pos, data_left, height=height, **kwargs)
@@ -44,14 +53,13 @@ def pyramid_plot(figure:Figure, ylabels: List, xticks: List, data_left: List, ti
     axes_left.set(yticks=y_pos, yticklabels=ylabels)
     axes_left.yaxis.tick_right()
     axes_left.set_title(title_left)
-    
+
     axes_right = figure.add_subplot(122)
     axes_right.barh(y_pos, data_right, height=height, **kwargs)
     axes_right.set(yticks=y_pos, yticklabels=[])
     axes_right.set_title(title_right)
 
-
-    #...
+    # ...
     if xticks is not None:
         axes_left.set(xticks=xticks)
         axes_right.set(xticks=xticks)
@@ -61,11 +69,11 @@ def pyramid_plot(figure:Figure, ylabels: List, xticks: List, data_left: List, ti
 
     return figure
 
-def hist_plot(figure:Figure, data: List, title: str=""):
-    if(figure is None):
+
+def hist_plot(figure: Figure, data: List, title: str = ""):
+    if figure is None:
         return None
 
-    
     axes = figure.add_subplot(111)
     # set tick size,...etc
     axes.yaxis.set_tick_params(labelsize=5)
@@ -76,7 +84,6 @@ def hist_plot(figure:Figure, data: List, title: str=""):
     axes.hist(bins[:-1], bins=bins, weights=counts, **hist_params)
 
     return figure
-
 
 
 class HistPanel(wx.Panel):
@@ -97,10 +104,9 @@ class HistPanel(wx.Panel):
         # Set up pubsub
         pub.subscribe(self.OnUpdateHistogram, "2dview.updated.image")
 
-
     def plot_histogram_img(self, img: str):
         """Plot a histogram
-        
+
         Arguments:
             img {str} -- image filepath string
         """
@@ -115,7 +121,7 @@ class HistPanel(wx.Panel):
 
     def plot_histogram(self, data_array: np.ndarray):
         """Plot a histogram
-        
+
         Arguments:
             data_array {np.ndarray} -- 1-d array
         """
@@ -124,16 +130,20 @@ class HistPanel(wx.Panel):
 
         # Plot
         hist_plot(self.figure, data_array)
-        
+
         self.canvas.draw()
         self.canvas.Refresh()
 
-    def plot_histogram_back_to_back(self, ylabels: List, xticks: List, counts_left: List, counts_right: List):
+    def plot_histogram_back_to_back(
+        self, ylabels: List, xticks: List, counts_left: List, counts_right: List
+    ):
         self.figure.clear()
 
         # Plot
 
-        pyramid_plot(self.figure, ylabels, xticks, counts_left, u"left", counts_right, u"right")
+        pyramid_plot(
+            self.figure, ylabels, xticks, counts_left, "left", counts_right, "right"
+        )
 
         self.canvas.draw()
         self.canvas.Refresh()
@@ -148,16 +158,16 @@ class HistPanel(wx.Panel):
         self.toolbar.update()
 
     def OnUpdateHistogram(self, msg):
-        print(f"Update Patient Histogram Panel")
+        # print(f"Update Patient Histogram Panel")
         """Update Histogram When 2D View Image Updated."""
         # logger.info(msg)
         image: Image.Image = msg["image_pil"]
 
         """Plot Single Histogram"""
         # Mock data
-        #data_array = np.array(image)
+        # data_array = np.array(image)
         # flatten to 1-d array
-        #self.plot_histogram(data_array.ravel())
+        # self.plot_histogram(data_array.ravel())
 
         """Plot Two back-to-back Histograms"""
         # Mock data
@@ -172,22 +182,26 @@ class HistPanel(wx.Panel):
         if np.max(data_sets) > 1:
             hist_range = (0, 250)
         number_of_bins = 10
-        counts_left, bins = np.histogram(data_left, range=hist_range, bins=number_of_bins)
-        counts_right, bins = np.histogram(data_right, range=hist_range, bins=number_of_bins)
-        xticks = None #np.arange(0, np.max([counts_left, counts_right]))
-        #print(bins)
-        #print(xticks)
-        #print(counts_left)
-        #print(counts_right)
+        counts_left, bins = np.histogram(
+            data_left, range=hist_range, bins=number_of_bins
+        )
+        counts_right, bins = np.histogram(
+            data_right, range=hist_range, bins=number_of_bins
+        )
+        xticks = None  # np.arange(0, np.max([counts_left, counts_right]))
+        # print(bins)
+        # print(xticks)
+        # print(counts_left)
+        # print(counts_right)
         bins = bins.astype(int)
         self.plot_histogram_back_to_back(bins[:-1], xticks, counts_left, counts_right)
-        
-        #self.plot_histogram_back_to_back([0, 100, 200, 300, 400, 500], None, [20, 30, 40, 50, 89, 20], [40, 30, 60, 50, 70, 10])
+
+        # self.plot_histogram_back_to_back([0, 100, 200, 300, 400, 500], None, [20, 30, 40, 50, 89, 20], [40, 30, 60, 50, 70, 10])
         # TODO: process real data here, here is expected to get `counts` and `bins` directly by specific method provided by robin
 
-
     def OnPaint(self, e):
-        print(f"OnPaint: {e}")
+        # print(f"OnPaint: {e}")
+        pass
 
     def OnSize(self, e):
         print(f"OnSize: {e}")
@@ -202,7 +216,7 @@ def run_HistPanel():
     histPanel = HistPanel(frame)
     # first
     histPanel.plot_histogram(np.random.randint(0, 100, (500)))
-    
+
     sizer.Add(histPanel, 1, wx.ALL | wx.EXPAND)
     frame.SetSizer(sizer)
     frame.Fit()
@@ -223,9 +237,7 @@ def run_and_update_HistPanel():
     histPanel.plot_histogram(np.random.randint(0, 100, (500)))
     # second
     wx.CallLater(
-        3000,
-        histPanel.plot_histogram_img,
-        util.GetResourcePath("book.png"),
+        3000, histPanel.plot_histogram_img, util.GetResourcePath("book.png"),
     )
     sizer.Add(histPanel, 1, wx.ALL | wx.EXPAND)
     frame.SetSizer(sizer)
@@ -233,6 +245,7 @@ def run_and_update_HistPanel():
 
     frame.Show(True)
     app.MainLoop()
+
 
 def run_two_HistPanel():
     app = wx.App()
@@ -242,7 +255,12 @@ def run_two_HistPanel():
 
     # first
     histPanel = HistPanel(frame)
-    histPanel.plot_histogram_back_to_back([0, 100, 200, 300, 400, 500], None, [20, 30, 40, 50, 89, 20], [40, 30, 60, 50, 70, 10])
+    histPanel.plot_histogram_back_to_back(
+        [0, 100, 200, 300, 400, 500],
+        None,
+        [20, 30, 40, 50, 89, 20],
+        [40, 30, 60, 50, 70, 10],
+    )
 
     sizer.Add(histPanel, 1, wx.ALL | wx.EXPAND)
     frame.SetSizer(sizer)
@@ -250,6 +268,7 @@ def run_two_HistPanel():
 
     frame.Show(True)
     app.MainLoop()
+
 
 if __name__ == "__main__":
     """Create the main window and insert the custom frame."""
