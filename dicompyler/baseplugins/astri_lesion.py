@@ -76,14 +76,14 @@ class pluginTest(wx.Panel):
 
     def OnUpdateAnalysis(self, files: List[str]):
         """Analyze the lesion with given DICOM files
-        
+
         Arguments:
             files {List[str]} -- a list of DICOM files, each value is expected to be the filepath
         """
 
         # Initialize the progress dialog
         dlgProgress = guiutil.get_progress_dialog(
-            wx.GetApp().GetTopWindow(), "Aanlyzing Lesion..."
+            wx.GetApp().GetTopWindow(), "Analyzing Lesion..."
         )
         # Set up the queue so that the thread knows which item was added
         # self.queue = queue.Queue()
@@ -104,7 +104,7 @@ class pluginTest(wx.Panel):
 
     def mock_analyze_file(self, file: str):
         """mock analyze algorithm, process one file
-        
+
         Arguments:
             file {str} -- [description]
         """
@@ -114,7 +114,7 @@ class pluginTest(wx.Panel):
         length = len(files)
 
         for i, file in enumerate(files):
-            wx.CallAfter(progressFunc, i, length, "Aanlyzing Lesion...")
+            wx.CallAfter(progressFunc, i, length, "Analyzing Lesion...")
 
             # TODO: replace with real analyzing algorithm
             self.mock_analyze_file(file)
