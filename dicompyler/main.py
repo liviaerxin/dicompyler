@@ -33,6 +33,7 @@ from dicompyler import plugin, preferences
 from dicompyler.hist_panel import HistPanel
 from dicompyler.lesion_statistics_panel import LesionStatisticsPanel
 
+
 class MainFrame(wx.Frame):
     def __init__(self, parent, id, title, res):
 
@@ -137,21 +138,20 @@ class MainFrame(wx.Frame):
         self.notebookPlot = XRCCTRL(self, "notebookPlot")
 
         self.histPanel = HistPanel(self.notebookPlot)
-        #self.histPanel.plot_histogram_img(util.GetResourcePath("book.png"))
+        # self.histPanel.plot_histogram_img(util.GetResourcePath("book.png"))
         self.notebookPlot.AddPage(self.histPanel, "Histogram")
-        
+
         """NotebookStatistics
             1. add lesion statistics panel
         """
         self.notebookStatistics = XRCCTRL(self, "notebookStatistics")
 
         self.lesionStatisticsPanel = LesionStatisticsPanel(self.notebookStatistics)
-        self.notebookStatistics.AddPage(self.lesionStatisticsPanel, "Lesion")  
+        self.notebookStatistics.AddPage(self.lesionStatisticsPanel, "Lesion")
 
         """Hide the left sizer"""
         self.leftSizer = self.panelGeneral.GetSizer()
         self.leftSizer.Hide(0)
-
 
         # Modify the control size on Mac
         controls = [self.notebookTools, self.choiceStructure]
@@ -578,7 +578,7 @@ class MainFrame(wx.Frame):
             for key, dvh in patient["dvhs"].items():
                 dvh.rx_dose = patient["plan"]["rxdose"] / 100
 
-        #time.sleep(2) # for test
+        # time.sleep(2) # for test
         wx.CallAfter(progressFunc, 100, 100, "Done")
         wx.CallAfter(updateFunc, patient)
 

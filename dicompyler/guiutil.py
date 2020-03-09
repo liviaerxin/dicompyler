@@ -12,6 +12,7 @@ import wx
 from wx.xrc import XmlResource, XRCCTRL, XRCID
 from pubsub import pub
 
+
 def IsMSWindows():
     """Are we running on Windows?
 

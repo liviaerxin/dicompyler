@@ -29,4 +29,3 @@ overlayed.save("./overlayed.png")
 # in-place
 image.paste((255, 0, 0), mask=overlay_mask)
 image.save("./out.png")
-

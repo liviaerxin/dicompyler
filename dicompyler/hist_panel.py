@@ -2,6 +2,8 @@ import wx
 import wx.lib.mixins.inspection as wit
 from pubsub import pub
 
+import matplotlib as mpl
+
 import matplotlib.image as mpimg
 from matplotlib.backends.backend_wxagg import (
     FigureCanvasWxAgg as FigureCanvas,
@@ -10,15 +12,20 @@ from matplotlib.backends.backend_wxagg import (
 from matplotlib.figure import Figure
 from matplotlib import font_manager
 
+
 import numpy as np
 from dicompyler import util
 
 from PIL import Image
 from typing import List
-
+import json
 import logging
 
 logger = logging.getLogger("dicompyler.hist_panel")
+
+
+# label_size = 8
+# mpl.rcParams['xtick.labelsize'] = label_size
 
 hist_params = {
     # "bins": 15,
@@ -46,18 +53,35 @@ def pyramid_plot(
     y_pos = np.arange(len(ylabels))
     # empty_ticks = tuple('' for n in ylabels)
 
+    # set yticks by slice
+    yticks = y_pos[::5]
+    yticklabels = ylabels[::5]
+
+    # space between bars
     height = 1
+
+    # left
     axes_left = figure.add_subplot(121)
     axes_left.barh(y_pos, data_left, height=height, **kwargs)
     axes_left.invert_xaxis()
-    axes_left.set(yticks=y_pos, yticklabels=ylabels)
+    axes_left.set_yticks(yticks)
+    # axes_left.set_yticklabels(yticklabels, fontsize=8)
+    axes_left.set_yticklabels(yticklabels)
+    axes_left.yaxis.set_tick_params(labelsize=7)
     axes_left.yaxis.tick_right()
     axes_left.set_title(title_left)
 
+    # right
     axes_right = figure.add_subplot(122)
     axes_right.barh(y_pos, data_right, height=height, **kwargs)
-    axes_right.set(yticks=y_pos, yticklabels=[])
+    axes_right.set_yticks(yticks)
+    axes_right.set_yticklabels([])
+    axes_right.yaxis.set_tick_params(labelsize=7)
     axes_right.set_title(title_right)
+
+    # line
+    axes_left.plot(Ref_Lung_Hist["left"], y_pos, "r")
+    axes_right.plot(Ref_Lung_Hist["right"], y_pos, "r")
 
     # ...
     if xticks is not None:
@@ -65,6 +89,7 @@ def pyramid_plot(
         axes_right.set(xticks=xticks)
 
     figure.tight_layout()
+    # set the left and right plot space
     figure.subplots_adjust(wspace=0.3)
 
     return figure
@@ -86,6 +111,11 @@ def hist_plot(figure: Figure, data: List, title: str = ""):
     return figure
 
 
+Ref_Lung = None
+with open(util.GetResourcePath("ref_lung_hist.json")) as f:
+    Ref_Lung_Hist = json.load(f)["hist"]
+
+
 class HistPanel(wx.Panel):
     def __init__(self, parent, dpi=None, figsize=(4, 4), *args, **kwargs):
         wx.Panel.__init__(self, parent, *args, **kwargs)
@@ -102,7 +132,7 @@ class HistPanel(wx.Panel):
         self.Bind(wx.EVT_PAINT, self.OnPaint)
 
         # Set up pubsub
-        pub.subscribe(self.OnUpdateHistogram, "2dview.updated.image")
+        pub.subscribe(self.OnUpdateHistogram, "patient.updated.lesion_analysis")
 
     def plot_histogram_img(self, img: str):
         """Plot a histogram
@@ -142,7 +172,13 @@ class HistPanel(wx.Panel):
         # Plot
 
         pyramid_plot(
-            self.figure, ylabels, xticks, counts_left, "left", counts_right, "right"
+            self.figure,
+            ylabels,
+            xticks,
+            counts_left,
+            "Left Lung",
+            counts_right,
+            "Right Lung",
         )
 
         self.canvas.draw()
@@ -158,46 +194,30 @@ class HistPanel(wx.Panel):
         self.toolbar.update()
 
     def OnUpdateHistogram(self, msg):
-        # print(f"Update Patient Histogram Panel")
-        """Update Histogram When 2D View Image Updated."""
+        print(f"Update Patient Histogram Panel")
+        """Update Histogram When Lesion Analysis Finish."""
         # logger.info(msg)
-        image: Image.Image = msg["image_pil"]
+
+        try:
+            hist_data = msg["result"]["hist"]
+
+            """Plot Two back-to-back Histograms"""
+            print(hist_data["HU"])
+            print(hist_data["left"])
+            print(hist_data["right"])
+            # TODO: process real data here, here is expected to get `counts` and `bins` directly by specific method provided by robin
+            self.plot_histogram_back_to_back(
+                hist_data["HU"][:-1], None, hist_data["left"], hist_data["right"]
+            )
+
+        except KeyError:
+            print("no valid data to plot histogram!")
 
         """Plot Single Histogram"""
         # Mock data
         # data_array = np.array(image)
         # flatten to 1-d array
         # self.plot_histogram(data_array.ravel())
-
-        """Plot Two back-to-back Histograms"""
-        # Mock data
-        data_array = np.array(image)
-        # flatten to 1-d array
-        data_left = data_array.ravel()
-        data_right = data_left + np.random.random(len(data_left))
-
-        # Mock counts, bins calculation
-        data_sets = [data_left, data_right]
-        hist_range = (np.min(data_sets), np.max(data_sets))
-        if np.max(data_sets) > 1:
-            hist_range = (0, 250)
-        number_of_bins = 10
-        counts_left, bins = np.histogram(
-            data_left, range=hist_range, bins=number_of_bins
-        )
-        counts_right, bins = np.histogram(
-            data_right, range=hist_range, bins=number_of_bins
-        )
-        xticks = None  # np.arange(0, np.max([counts_left, counts_right]))
-        # print(bins)
-        # print(xticks)
-        # print(counts_left)
-        # print(counts_right)
-        bins = bins.astype(int)
-        self.plot_histogram_back_to_back(bins[:-1], xticks, counts_left, counts_right)
-
-        # self.plot_histogram_back_to_back([0, 100, 200, 300, 400, 500], None, [20, 30, 40, 50, 89, 20], [40, 30, 60, 50, 70, 10])
-        # TODO: process real data here, here is expected to get `counts` and `bins` directly by specific method provided by robin
 
     def OnPaint(self, e):
         # print(f"OnPaint: {e}")

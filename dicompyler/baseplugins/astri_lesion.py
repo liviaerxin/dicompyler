@@ -10,6 +10,7 @@ from dicompyler import guiutil, util
 import pydicom
 from typing import List
 import time
+import json
 
 
 def pluginProperties():
@@ -121,8 +122,9 @@ class pluginTest(wx.Panel):
 
         wx.CallAfter(progressFunc, length, length, "Done")
 
-        #
-        pub.sendMessage(
-            "patient.updated.lesion_analysis", msg={"result": "lesion_analysis_result"}
-        )
+        # Mock analysis result
+        result = None
+        with open(util.GetResourcePath("lung_stats.json")) as f:
+            result = json.load(f)
 
+        pub.sendMessage("patient.updated.lesion_analysis", msg={"result": result})
