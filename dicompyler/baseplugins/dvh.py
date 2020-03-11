@@ -28,9 +28,8 @@ def pluginProperties():
     props["version"] = "0.5.0"
     props["plugin_type"] = "main"
     # props["plugin_version"] = 1
-    props[
-        "plugin_version"
-    ] = 0.1  # not qualified version, so that the app will not load this plugin
+    # not qualified version, so that the app will not load this plugin
+    props["plugin_version"] = None
     props["min_dicom"] = ["rtss", "rtdose"]
     props["recommended_dicom"] = ["rtss", "rtdose", "rtplan"]
 
