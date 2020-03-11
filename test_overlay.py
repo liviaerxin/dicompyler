@@ -14,18 +14,25 @@ def generate_random_overlay(size, threshold=0.7):
     return im
 
 
+def load_npy(file, index):
+    npy = np.load(file).copy()
+    npy[np.nonzero(npy)] = 255  # map all category to 255
+    im = Image.fromarray(npy[index], mode="L")
+    return im
+
+
 # note source image MUST be "RGBA"
-image: Image = Image.open("./base.jpg").convert("RGBA")
+image: Image = Image.open("./base.png").convert("RGBA")
 size = (image.size[0], image.size[1])
 
-overlay_mask = generate_random_overlay(size)
-# overlay_mask.save("./mask.png")
-# solidfill = Image.new(mode="RGBA", size=size, color=(255, 0, 0))
+# overlay_mask: Image = generate_random_overlay(size)
+overlay_mask: Image = load_npy("./dicompyler/resources/TCGA-17-Z019.npy", index=15)
+overlay_mask.save("./mask.png")
 
 # with copy
-overlayed = Image.composite((255, 0, 0), image, mask=overlay_mask)
-overlayed.save("./overlayed.png")
+overlayed: Image = Image.composite((255, 0, 0), image, mask=overlay_mask)
+overlayed.save("./out.composite.png")
 
 # in-place
 image.paste((255, 0, 0), mask=overlay_mask)
-image.save("./out.png")
+image.save("./out.inplace.png")

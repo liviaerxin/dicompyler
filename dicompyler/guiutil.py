@@ -143,7 +143,8 @@ class ProgressDialog(wx.Dialog):
         if not length:
             percentDone = 0
         else:
-            # Fix #115, clip value
+            # kylee: Fix #115, clip value
+            # "Done" message's `length` is less then `num` on Linux
             percentDone = max(0, min(int(100 * (num) / length), 100))
 
         self.gaugeProgress.SetValue(percentDone)
