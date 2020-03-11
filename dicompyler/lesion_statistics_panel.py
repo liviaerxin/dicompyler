@@ -113,7 +113,7 @@ class LesionStatisticsPanel(wx.Panel):
         self.SetSizer(hbox)
 
         # Set up pubsub
-        pub.subscribe(self.OnUpdateLesion, "patient.updated.lesion_analysis")
+        pub.subscribe(self.OnUpdateLesion, "lesion.loaded.analysis")
 
     def update_lesion_list(self, data):
 

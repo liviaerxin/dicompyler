@@ -2,15 +2,16 @@ import logging
 
 logger = logging.getLogger("dicompyler.plugins.astri_leision")
 
-import wx
-from pubsub import pub
-import pprint
-import os, threading
 from dicompyler import guiutil, util
-import pydicom
+from pubsub import pub
 from typing import List
-import time
 import json
+import numpy as np
+import os.path as path
+import pydicom
+import threading
+import time
+import wx
 
 
 def pluginProperties():
@@ -71,11 +72,11 @@ class pluginTest(wx.Panel):
                 else:
                     print(f"unable to process the image: {type(image)}")
 
-        self.OnUpdateAnalysis(files)
+        self.RunAnalysis(files)
 
         pub.unsubscribe(self.OnUpdatePatient, "patient.updated.raw_data")
 
-    def OnUpdateAnalysis(self, files: List[str]):
+    def RunAnalysis(self, files: List[str]):
         """Analyze the lesion with given DICOM files
 
         Arguments:
@@ -100,7 +101,6 @@ class pluginTest(wx.Panel):
 
     def OnDestroy(self, evt):
         """Unbind to all events before the plugin is destroyed."""
-
         pub.unsubscribe(self.OnUpdatePatient, "patient.updated.raw_data")
 
     def mock_analyze_file(self, file: str):
@@ -122,9 +122,15 @@ class pluginTest(wx.Panel):
 
         wx.CallAfter(progressFunc, length, length, "Done")
 
+        # Mock lesion mask
+        maskpath = util.GetResourcePath("TCGA-17-Z019.npy")
+        if path.isfile(maskpath):
+            mask: np.ndarray = np.load(maskpath)
+            # mask.shape: (Z, X, Y)
+            pub.sendMessage("lesion.loaded.mask", msg={"mask": mask})
+
         # Mock analysis result
         result = None
         with open(util.GetResourcePath("lung_stats.json")) as f:
             result = json.load(f)
-
-        pub.sendMessage("patient.updated.lesion_analysis", msg={"result": result})
+            pub.sendMessage("lesion.loaded.analysis", msg={"result": result})
