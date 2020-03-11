@@ -1431,7 +1431,7 @@
                 <object class="sizeritem" expanded="0">
                     <property name="border">3</property>
                     <property name="flag">wxALL|wxEXPAND|wxALIGN_CENTRE</property>
-                    <property name="proportion">8</property>
+                    <property name="proportion">7</property>
                     <object class="wxBoxSizer" expanded="0">
                         <property name="minimum_size"></property>
                         <property name="name">bSizer19</property>
@@ -2039,11 +2039,11 @@
                         </object>
                     </object>
                 </object>
-                <object class="sizeritem" expanded="0">
+                <object class="sizeritem" expanded="1">
                     <property name="border">0</property>
                     <property name="flag">wxALL|wxEXPAND</property>
                     <property name="proportion">4</property>
-                    <object class="wxBoxSizer" expanded="0">
+                    <object class="wxBoxSizer" expanded="1">
                         <property name="minimum_size">-1,-1</property>
                         <property name="name">bSizer66</property>
                         <property name="orient">wxVERTICAL</property>
@@ -2124,7 +2124,7 @@
                         <object class="sizeritem" expanded="0">
                             <property name="border">0</property>
                             <property name="flag">wxEXPAND</property>
-                            <property name="proportion">1</property>
+                            <property name="proportion">0</property>
                             <object class="wxStaticBoxSizer" expanded="0">
                                 <property name="id">wxID_ANY</property>
                                 <property name="label">Statistics</property>

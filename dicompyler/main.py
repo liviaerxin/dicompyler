@@ -139,7 +139,7 @@ class MainFrame(wx.Frame):
 
         self.histPanel = HistPanel(self.notebookPlot)
         # self.histPanel.plot_histogram_img(util.GetResourcePath("book.png"))
-        self.notebookPlot.AddPage(self.histPanel, "Histogram")
+        self.notebookPlot.AddPage(self.histPanel, "Density Analysis")
 
         """NotebookStatistics
             1. add lesion statistics panel
@@ -147,7 +147,7 @@ class MainFrame(wx.Frame):
         self.notebookStatistics = XRCCTRL(self, "notebookStatistics")
 
         self.lesionStatisticsPanel = LesionStatisticsPanel(self.notebookStatistics)
-        self.notebookStatistics.AddPage(self.lesionStatisticsPanel, "Lesion")
+        self.notebookStatistics.AddPage(self.lesionStatisticsPanel, "Lesion Statistic")
 
         """Hide the left sizer"""
         self.leftSizer = self.panelGeneral.GetSizer()

@@ -259,7 +259,7 @@
 				</object>
 			</object>
 			<object class="sizeritem">
-				<option>8</option>
+				<option>7</option>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTRE</flag>
 				<border>3</border>
 				<object class="wxBoxSizer">
@@ -402,7 +402,7 @@
 						</object>
 					</object>
 					<object class="sizeritem">
-						<option>1</option>
+						<option>0</option>
 						<flag>wxEXPAND</flag>
 						<border>0</border>
 						<object class="wxStaticBoxSizer">

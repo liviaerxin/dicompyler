@@ -36,6 +36,10 @@ hist_params = {
     "alpha": 0.5,
 }
 
+Ref_Lung = None
+with open(util.GetResourcePath("ref_lung_hist.json")) as f:
+    Ref_Lung_Hist = json.load(f)["hist"]
+
 
 def pyramid_plot(
     figure: Figure,
@@ -111,11 +115,6 @@ def hist_plot(figure: Figure, data: List, title: str = ""):
     return figure
 
 
-Ref_Lung = None
-with open(util.GetResourcePath("ref_lung_hist.json")) as f:
-    Ref_Lung_Hist = json.load(f)["hist"]
-
-
 class HistPanel(wx.Panel):
     def __init__(self, parent, dpi=None, figsize=(4, 4), *args, **kwargs):
         wx.Panel.__init__(self, parent, *args, **kwargs)
@@ -184,6 +183,75 @@ class HistPanel(wx.Panel):
         self.canvas.draw()
         self.canvas.Refresh()
 
+    def plot_histogram_line_by_line(
+        self, bins: List, counts_left: List, counts_right: List
+    ):
+        self.figure.clear()
+        self.figure.subplots_adjust(hspace=0.3)
+
+        # 1. Plot Right Lung
+        ax_right_lung = self.figure.add_subplot(211)
+
+        # 1.1. configure
+        ax_right_lung.grid(True, linestyle="-.")
+        ax_right_lung.tick_params(axis="x", labelsize=6, labelrotation=45)
+        ax_right_lung.set_title(
+            label="Right Lung", x=-0.05, y=1, fontdict={"fontsize": 8}
+        )
+        # ax_right_lung.set_ylabel("Right Lung")
+
+        # 1.2. set xticks by slice
+        xticks = bins[::10]
+        ax_right_lung.set_xticks(xticks)
+        ax_right_lung.set_yticklabels([])
+
+        # 1.3 plot hist
+        ax_right_lung.hist(bins[:-1], bins=bins, weights=counts_right, label="Present")
+
+        # 1.4 plot ref hist line
+        ax_right_lung.plot(
+            Ref_Lung_Hist["HU"][:-1], Ref_Lung_Hist["right"], "r", label="Reference"
+        )
+        ax_right_lung.legend()
+
+        # 2. Plot Left Lung
+        ax_left_lung = self.figure.add_subplot(212)
+
+        # 2.1. configure
+        ax_left_lung.grid(True, linestyle="-.")
+        ax_left_lung.tick_params(axis="x", labelsize=6, labelrotation=45)
+        ax_left_lung.set_title(
+            label="Left Lung", x=-0.05, y=1, fontdict={"fontsize": 8}
+        )
+
+        # 2.2. set xticks by slice
+        xticks = bins[::10]
+        ax_left_lung.set_xticks(xticks)
+        ax_left_lung.set_yticklabels([])
+        ax_left_lung.set_xlim(-750, 100)
+
+        # 2.3 plot hist
+        ax_left_lung.hist(bins[:-1], bins=bins, weights=counts_right, label="Present")
+
+        # 2.4 plot ref hist line
+        ax_left_lung.plot(
+            Ref_Lung_Hist["HU"][:-1], Ref_Lung_Hist["left"], "r", label="Reference"
+        )
+        ax_left_lung.legend()
+
+        ax_left_lung.set_xlabel("CT Value")
+
+        # redraw
+        self.canvas.draw()
+        self.canvas.Refresh()
+
+        # TODO: Test OnChangeCTRange
+        # wx.CallLater(3000, self.OnChangeCTRange, -800, 100)
+
+    def OnChangeCTRange(self, left, right):
+        for ax in self.figure.axes:
+            print(ax)
+
     def add_toolbar(self):
         self.toolbar = NavigationToolbar(self.canvas)
         self.toolbar.Realize()
@@ -202,12 +270,15 @@ class HistPanel(wx.Panel):
             hist_data = msg["result"]["hist"]
 
             """Plot Two back-to-back Histograms"""
-            print(hist_data["HU"])
-            print(hist_data["left"])
-            print(hist_data["right"])
+            # print(hist_data["HU"])
+            # print(hist_data["left"])
+            # print(hist_data["right"])
             # TODO: process real data here, here is expected to get `counts` and `bins` directly by specific method provided by robin
-            self.plot_histogram_back_to_back(
-                hist_data["HU"][:-1], None, hist_data["left"], hist_data["right"]
+            # self.plot_histogram_back_to_back(
+            #     hist_data["HU"][:-1], None, hist_data["left"], hist_data["right"]
+            # )
+            self.plot_histogram_line_by_line(
+                hist_data["HU"], hist_data["left"], hist_data["right"]
             )
 
         except KeyError:

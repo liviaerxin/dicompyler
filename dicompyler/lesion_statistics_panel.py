@@ -2,7 +2,12 @@ import wx
 import wx.lib.mixins.listctrl
 from pubsub import pub
 
+from typing import List
 from random import randint
+import json
+
+from dicompyler import util
+
 
 import logging, logging.handlers
 
@@ -10,26 +15,69 @@ logger = logging.getLogger("dicompyler.lesion_panel")
 
 
 mock_data = [
-    ("左肺上叶", "7%", "53%"),
-    ("左肺下叶", "13%", "27%"),
-    ("右肺上叶", "4%", "26%"),
-    ("右肺中叶", "2%", "25%"),
-    ("右肺下叶", "12%", "30%"),
+    {
+        "id": 1,
+        "pattern": "GGO",
+        "location": "left",
+        "volume": 3.28,
+        "percentage": 0.06,
+        "density": -700,
+        "start_slice": 90,
+        "end_slice": 96,
+        "representative_slice": 93,
+    },
+    {
+        "id": 2,
+        "pattern": "GGO",
+        "location": "left",
+        "volume": 1.97,
+        "percentage": 0.04,
+        "density": -730,
+        "start_slice": 90,
+        "end_slice": 96,
+        "representative_slice": 93,
+    },
 ]
 
 mock_data1 = [
-    ("左肺上叶", "17%", "13%"),
-    ("左肺下叶", "23%", "47%"),
-    ("右肺上叶", "14%", "56%"),
-    ("右肺中叶", "20%", "95%"),
-    ("右肺下叶", "22%", "60%"),
+    {
+        "id": 3,
+        "pattern": "consolidation",
+        "location": "right",
+        "volume": 32.73,
+        "percentage": 0.6,
+        "density": -300,
+        "start_slice": 100,
+        "end_slice": 120,
+        "representative_slice": 107,
+    }
 ]
 
 COLUMN = [
-    ("位置", 100),
-    ("实性密度影", 20),
-    ("磨玻璃密度", 20),
+    {"name": "No.", "key": "id"},
+    {"name": "Pattern", "key": "pattern"},
+    {"name": "Slices", "key": "slices"},
+    {"name": "Volume(%)", "key": "volume"},
+    {"name": "Density(HU)", "key": "density"},
+    {"name": "Location", "key": "location"},
 ]
+
+
+def pre_process_data(data: List):
+    for item in data:
+        # combine `start_slice` and `end_slice` to `slice`
+        item["slices"] = "-".join(
+            [
+                str(item["start_slice"]),
+                str(item["representative_slice"]),
+                str(item["end_slice"]),
+            ]
+        )
+
+        # convert to str
+        item["id"] = str(item["id"])
+        item["volume"] = str(item["volume"])
+        item["density"] = str(item["density"])
 
 
 class SortedListCtrl(
@@ -53,10 +101,12 @@ class LesionStatisticsPanel(wx.Panel):
 
         # Initialize data list control view
         self.list = SortedListCtrl(self)
-        self.list.InsertColumn(0, COLUMN[0][0], width=COLUMN[0][1])
-        self.list.InsertColumn(1, COLUMN[1][0])
-        self.list.InsertColumn(2, COLUMN[2][0])
-        self.list.SetFont(wx.Font(wx.FontInfo(14)))
+
+        for i, col in enumerate(COLUMN):
+            self.list.InsertColumn(i, col["name"])
+
+        # Font size
+        # self.list.SetFont(wx.Font(wx.FontInfo(10)))
 
         # sizer
         hbox.Add(self.list, 1, wx.EXPAND)
@@ -70,20 +120,28 @@ class LesionStatisticsPanel(wx.Panel):
         self.list.DeleteAllItems()
 
         idx = 0
+        pre_process_data(data)
 
         for item in data:
 
-            index = self.list.InsertItem(idx, item[0])
-            self.list.SetItem(index, 1, item[1])
-            self.list.SetItem(index, 2, item[2])
+            index = self.list.InsertItem(idx, item["id"])
+            self.list.SetItem(index, 1, item["pattern"])
+            self.list.SetItem(index, 2, item["slices"])
+            self.list.SetItem(index, 3, item["volume"])
+            self.list.SetItem(index, 4, item["density"])
+            self.list.SetItem(index, 5, item["location"])
             self.list.SetItemData(index, idx)
             idx += 1
 
     def OnUpdateLesion(self, msg):
         print("Update Patient Lesion Statistics Panel")
+
         # TODO: real data instead of mock data
 
-        data = [mock_data, mock_data1][randint(0, 1)]
+        # data = [mock_data, mock_data1][randint(0, 1)]
+        with open(util.GetResourcePath("lung_stats.json")) as f:
+            data = json.load(f)["lesion_list"]
+
         self.update_lesion_list(data)
 
 
