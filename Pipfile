@@ -12,6 +12,8 @@ numpy = ">=1.13.1"
 wxmplot = ">=0.9.40"
 pydicom = ">=1.4"
 wxPython = ">=4.0.0b2"
+pillow = "*"
+pyinstaller = {file = "https://github.com/pyinstaller/pyinstaller/archive/develop.zip"}
 
 [requires]
-python_version = "3.8"
+#python_version = "3.8"
