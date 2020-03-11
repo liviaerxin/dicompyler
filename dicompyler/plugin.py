@@ -35,6 +35,8 @@ def import_plugins(userpath=None):
 
     modules = []
     plugins = []
+    # kylee: sort plugin by file name
+    possibleplugins = sorted(possibleplugins, key=lambda p: p["plugin"])
     for p in possibleplugins:
         module = p["plugin"].split(".")[0]
         if module not in modules:
