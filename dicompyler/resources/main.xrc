@@ -629,4 +629,79 @@
 		<packing>0</packing>
 		<separation>0</separation>
 	</object>
+	<object class="wxPanel" name="panelDensityHistogram">
+		<style>wxTAB_TRAVERSAL</style>
+		<size>500,300</size>
+		<object class="wxBoxSizer">
+			<orient>wxVERTICAL</orient>
+			<object class="sizeritem">
+				<option>1</option>
+				<flag>wxEXPAND</flag>
+				<border>5</border>
+				<object class="wxBoxSizer">
+					<orient>wxVERTICAL</orient>
+					<object class="sizeritem">
+						<option>0</option>
+						<flag>wxALIGN_RIGHT</flag>
+						<border>5</border>
+						<object class="wxBoxSizer">
+							<orient>wxHORIZONTAL</orient>
+							<object class="sizeritem">
+								<option>0</option>
+								<flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+								<border>5</border>
+								<object class="wxStaticText" name="m_staticText31">
+									<label>CT Value Range:</label>
+									<wrap>-1</wrap>
+								</object>
+							</object>
+							<object class="sizeritem">
+								<option>0</option>
+								<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<object class="wxSpinCtrlDouble" name="spinLeft">
+									<style>wxSP_ARROW_KEYS</style>
+									<value>0</value>
+									<min>0</min>
+									<max>100</max>
+									<inc>1</inc>
+									<digits>0</digits>
+								</object>
+							</object>
+							<object class="sizeritem">
+								<option>0</option>
+								<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<object class="wxStaticText" name="m_staticText32">
+									<label>-</label>
+									<wrap>-1</wrap>
+								</object>
+							</object>
+							<object class="sizeritem">
+								<option>0</option>
+								<flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+								<border>5</border>
+								<object class="wxSpinCtrlDouble" name="spinRight">
+									<style>wxSP_ARROW_KEYS</style>
+									<value>0</value>
+									<min>0</min>
+									<max>100</max>
+									<inc>1</inc>
+									<digits>0</digits>
+								</object>
+							</object>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<option>1</option>
+						<flag>wxEXPAND</flag>
+						<border>5</border>
+						<object class="wxBoxSizer">
+							<orient>wxVERTICAL</orient>
+						</object>
+					</object>
+				</object>
+			</object>
+		</object>
+	</object>
 </resource>

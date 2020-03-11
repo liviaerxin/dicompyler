@@ -1,4 +1,5 @@
 import wx
+import wx.xrc as xrc
 import wx.lib.mixins.inspection as wit
 from pubsub import pub
 
@@ -36,9 +37,14 @@ hist_params = {
     "alpha": 0.5,
 }
 
-Ref_Lung = None
+Ref_Lung_Hist = None
 with open(util.GetResourcePath("ref_lung_hist.json")) as f:
     Ref_Lung_Hist = json.load(f)["hist"]
+
+# Suppose value increase from 0,...,N
+DefaultSpinLeft = Ref_Lung_Hist["HU"][0]
+DefaultSpinRight = Ref_Lung_Hist["HU"][-1]
+DefaultSpinStep = 100
 
 
 def pyramid_plot(
@@ -116,22 +122,98 @@ def hist_plot(figure: Figure, data: List, title: str = ""):
 
 
 class HistPanel(wx.Panel):
-    def __init__(self, parent, dpi=None, figsize=(4, 4), *args, **kwargs):
-        wx.Panel.__init__(self, parent, *args, **kwargs)
-        self.figure = Figure(figsize=figsize, dpi=dpi)
+    def __init__(self, parent, dpi=None, figsize=(4, 4)):
+        wx.Panel.__init__(self, parent, id=wx.ID_ANY)
 
-        self.canvas = FigureCanvas(self, -1, self.figure)
+        # Load the from `panelDensityHistogram` in the `xrc` file
+        # res = xrc.XmlResource(util.GetResourcePath("main.xrc"))
+        # res.LoadPanel(self, parent, "panelDensityHistogram")
 
-        self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.sizer.Add(self.canvas, 1, wx.EXPAND | wx.ALL)
-        self.SetSizer(self.sizer)
+        # Initialize controls
+        # self.panelPlot = xrc.XRCCTRL(self, "panelPlot")
+
+        # sizer = wx.BoxSizer(wx.VERTICAL)
+        # sizer.Add(self.canvas, 1, wx.EXPAND | wx.ALL)
+        # self.panelPlot.SetSizer(sizer)
 
         # self.add_toolbar()  # add as needed
 
-        self.Bind(wx.EVT_PAINT, self.OnPaint)
+        # Initialize controls
+
+        bSizer1 = wx.BoxSizer(wx.VERTICAL)
+
+        bSizer2 = wx.BoxSizer(wx.VERTICAL)
+
+        bSizer3 = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.m_staticText31 = wx.StaticText(
+            self, wx.ID_ANY, "CT Value Range:", wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.m_staticText31.Wrap(-1)
+
+        bSizer3.Add(self.m_staticText31, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        self.spinLeft = wx.SpinCtrlDouble(
+            self,
+            wx.ID_ANY,
+            wx.EmptyString,
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            wx.SP_ARROW_KEYS,
+            DefaultSpinLeft,
+            DefaultSpinRight,
+            DefaultSpinLeft,
+            DefaultSpinStep,
+        )
+        self.spinLeft.SetDigits(0)
+        bSizer3.Add(self.spinLeft, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5)
+
+        self.m_staticText32 = wx.StaticText(
+            self, wx.ID_ANY, "-", wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.m_staticText32.Wrap(-1)
+
+        bSizer3.Add(self.m_staticText32, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5)
+
+        self.spinRight = wx.SpinCtrlDouble(
+            self,
+            wx.ID_ANY,
+            wx.EmptyString,
+            wx.DefaultPosition,
+            wx.DefaultSize,
+            wx.SP_ARROW_KEYS,
+            DefaultSpinLeft,
+            DefaultSpinRight,
+            DefaultSpinRight,
+            DefaultSpinStep,
+        )
+        self.spinRight.SetDigits(0)
+        bSizer3.Add(self.spinRight, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        bSizer2.Add(bSizer3, 0, wx.ALIGN_RIGHT, 5)
+
+        bSizer4 = wx.BoxSizer(wx.VERTICAL)
+
+        # Initialize matplot figure
+        self.figure = Figure(figsize=figsize, dpi=dpi)
+        self.canvas = FigureCanvas(self, -1, self.figure)
+        bSizer4.Add(self.canvas, 1, wx.EXPAND | wx.ALL, 5)
+
+        bSizer2.Add(bSizer4, 1, wx.EXPAND, 5)
+
+        bSizer1.Add(bSizer2, 1, wx.EXPAND, 5)
+
+        self.SetSizer(bSizer1)
+        self.Layout()
+
+
+        # Bind interface events to the proper methods
+        self.Bind(wx.EVT_SPINCTRLDOUBLE, self.OnChangeCTRange, self.spinLeft)
+        self.Bind(wx.EVT_SPINCTRLDOUBLE, self.OnChangeCTRange, self.spinRight)
 
         # Set up pubsub
         pub.subscribe(self.OnUpdateHistogram, "lesion.loaded.analysis")
+
 
     def plot_histogram_img(self, img: str):
         """Plot a histogram
@@ -228,7 +310,6 @@ class HistPanel(wx.Panel):
         xticks = bins[::10]
         ax_left_lung.set_xticks(xticks)
         ax_left_lung.set_yticklabels([])
-        ax_left_lung.set_xlim(-750, 100)
 
         # 2.3 plot hist
         ax_left_lung.hist(bins[:-1], bins=bins, weights=counts_right, label="Present")
@@ -248,9 +329,24 @@ class HistPanel(wx.Panel):
         # TODO: Test OnChangeCTRange
         # wx.CallLater(3000, self.OnChangeCTRange, -800, 100)
 
-    def OnChangeCTRange(self, left, right):
+    def OnChangeCTRange(self, event):
+        left = self.spinLeft.GetValue()
+        right = self.spinRight.GetValue()
+        if (left > right):
+            print("Warning: right must be larger than left!!")
+            return
+
+        if len(self.figure.axes) == 0:
+            print("No Axes to Change")
+            return
+        
         for ax in self.figure.axes:
-            print(ax)
+            ax.set_xlim(left, right)
+            ax.autoscale_view()
+        
+        # redraw
+        self.canvas.draw()
+        self.canvas.Refresh()
 
     def add_toolbar(self):
         self.toolbar = NavigationToolbar(self.canvas)

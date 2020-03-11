@@ -152,7 +152,7 @@ def run_LesionPanel():
     sizer = wx.BoxSizer(wx.VERTICAL)
 
     """code"""
-    lesionPanel = LesionPanel(frame)
+    lesionPanel = LesionStatisticsPanel(frame)
     lesionPanel.update_lesion_list(mock_data)
 
     sizer.Add(lesionPanel, 1, wx.ALL | wx.EXPAND)
@@ -169,7 +169,7 @@ def run_and_update_LesionPanel():
     sizer = wx.BoxSizer(wx.VERTICAL)
 
     """code"""
-    lesionPanel = LesionPanel(frame)
+    lesionPanel = LesionStatisticsPanel(frame)
 
     # first
     lesionPanel.update_lesion_list(mock_data)
