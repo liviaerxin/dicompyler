@@ -262,7 +262,7 @@ class plugin2DView(wx.Panel):
         pub.unsubscribe(self.OnIsodoseCheck, "isodoses.checked")
         pub.unsubscribe(self.OnDrawingPrefsChange, "2dview.drawingprefs")
         pub.unsubscribe(self.OnPluginLoaded, "plugin.loaded.2dview")
-        pub.subscribe(self.OnMaskLoaded, "lesion.loaded.mask")
+        pub.unsubscribe(self.OnLesionMaskLoaded, "lesion.loaded.mask")
         # self.OnUnfocus()
 
     def OnStructureCheck(self, msg):
