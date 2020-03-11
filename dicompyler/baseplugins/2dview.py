@@ -22,7 +22,7 @@ import dicompylercore
 from PIL import Image
 
 
-def generate_random_overlay(size, threshold=0.7):
+def generate_random_overlay(size: tuple, threshold=0.7) -> Image:
     """return a random image of size with patches of grayscale """
     assert size[0] % 16 == 0 and size[1] % 16 == 0
     qsize = (size[0] // 16, size[1] // 16)  # patch size = 1/16 of size
@@ -85,6 +85,7 @@ class plugin2DView(wx.Panel):
         self.bheight = 0
         self.xpos = 0
         self.ypos = 0
+        self.leision_mask = None
         self.mousepos = wx.Point(-10000, -10000)
         self.mouse_in_window = False
         self.isodose_line_style = "Solid"
@@ -172,7 +173,13 @@ class plugin2DView(wx.Panel):
         pub.subscribe(self.OnRefresh, "2dview.refresh")
         pub.subscribe(self.OnDrawingPrefsChange, "2dview.drawingprefs")
         pub.subscribe(self.OnPluginLoaded, "plugin.loaded.2dview")
+        pub.subscribe(self.OnLesionMaskLoaded, "lesion.loaded.mask")
         pub.sendMessage("preferences.requested.values", msg="2dview.drawingprefs")
+
+    def OnLesionMaskLoaded(self, msg):
+        """Save mask locally."""
+        if "mask" in msg:
+            self.leision_mask = msg["mask"]
 
     def OnUpdatePatient(self, msg):
         """Update and load the patient data."""
@@ -255,6 +262,7 @@ class plugin2DView(wx.Panel):
         pub.unsubscribe(self.OnIsodoseCheck, "isodoses.checked")
         pub.unsubscribe(self.OnDrawingPrefsChange, "2dview.drawingprefs")
         pub.unsubscribe(self.OnPluginLoaded, "plugin.loaded.2dview")
+        pub.subscribe(self.OnMaskLoaded, "lesion.loaded.mask")
         # self.OnUnfocus()
 
     def OnStructureCheck(self, msg):
@@ -454,6 +462,20 @@ class plugin2DView(wx.Panel):
         y = (np.array(doselut[1]) - pixlut[1][0]) * prone / spacing[1]
         return (x, y)
 
+    def GetOpacityMask(self, index: int, opacity=0.7) -> Image:
+        """The mask returned specify the opacity only,
+        the color is determined in composition """
+        if self.leision_mask is None:
+            # use random data if mask is not present
+            imdata = self.images[index].GetImageData()
+            return generate_random_overlay((imdata["rows"], imdata["columns"]))
+
+        npy = self.leision_mask[index].copy()
+        # map all category (non-zero value) to 255, apply opacity
+        OPACITY = int(255 * opacity)
+        npy[np.nonzero(npy)] = OPACITY
+        return Image.fromarray(npy, mode="L")
+
     def OnPaint(self, evt):
         """Update the panel when it needs to be refreshed."""
 
@@ -495,16 +517,17 @@ class plugin2DView(wx.Panel):
                 gc.SetPen(wx.Pen(wx.Colour(0, 0, 0)))
                 gc.DrawRectangle(0, 0, width, height)
 
-            # save PIL handle for message
-            image_pil = self.images[self.imagenum - 1].GetImage(self.window, self.level)
             ## add overlay
-            overlay_mask = generate_random_overlay(
-                (image_pil.size[0], image_pil.size[1])
+            OVERLAY_COLOR = (255, 0, 0)
+            overlayed: Image = Image.composite(
+                OVERLAY_COLOR,
+                # need RGBA for composition
+                self.images[self.imagenum - 1]
+                .GetImage(self.window, self.level)
+                .convert("RGBA"),
+                mask=self.GetOpacityMask(self.imagenum - 1),
             )
-            overlayed = Image.composite(
-                (255, 0, 0), image_pil.convert("RGBA"), mask=overlay_mask
-            )
-            ## add overlay
+            ## add overlay end
             image = guiutil.convert_pil_to_wx(overlayed)
 
             bmp = wx.Bitmap(image)
@@ -590,7 +613,6 @@ class plugin2DView(wx.Panel):
                     "transx": transx,  # current x translation
                     "transy": transy,  # current y translation
                     "imdata": imdata,  # image data dictionary
-                    "image_pil": image_pil,  # image(PIL)
                     "patientpixlut": self.structurepixlut,
                 },
             )

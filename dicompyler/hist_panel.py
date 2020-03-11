@@ -131,7 +131,7 @@ class HistPanel(wx.Panel):
         self.Bind(wx.EVT_PAINT, self.OnPaint)
 
         # Set up pubsub
-        pub.subscribe(self.OnUpdateHistogram, "patient.updated.lesion_analysis")
+        pub.subscribe(self.OnUpdateHistogram, "lesion.loaded.analysis")
 
     def plot_histogram_img(self, img: str):
         """Plot a histogram
