@@ -823,7 +823,6 @@ class DicomImporterDialog(wx.Dialog):
                 elif not (images[0].AcquisitionNumber == images[1].AcquisitionNumber):
                     sort = "AcquisitionNumber"
 
-            logger.debug(f"parallel: {parallel}, sort: {sort}")
             # Add the sort descriptor to a list to be sorted
             for i, image in enumerate(images):
                 if sort == "IPP":

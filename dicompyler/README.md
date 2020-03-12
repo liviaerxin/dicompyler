@@ -46,11 +46,10 @@
 
 ## dicomplyer study
 
-- `dicomgui.py::DirectorySearchThread()` scan dcm files show as tree
-- `dicomgui.py::GetPatientData()` update `patient["images"]` sort order:
+- `dicomgui.py::ImportDicom()` will call `DicomImporterDialog.GetPatientData()`, then publish result with "patient.updated.raw_data" message
+- `dicomgui.py::DicomImporterDialog.GetPatientData()` will enumerate the file array, parse DCM files and then sort the images and store in `patient["images"]`:
 
   ```python
-  # dicomgui.py::GetPatientData()
   image = dicomgui.patient["images"][i]  # dp.ds, DicomParser.FileDataset
   image.ImagePositionPatient, image.InstanceNumber, image.AcquisitionNumber
   ```

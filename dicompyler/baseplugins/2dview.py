@@ -179,7 +179,10 @@ class plugin2DView(wx.Panel):
     def OnLesionMaskLoaded(self, msg):
         """Save mask locally."""
         if "mask" in msg:
-            self.leision_mask = msg["mask"]
+            # HACK: the order of `.npy` of reverse of our image order
+            # it should be "head first"
+            # use copy as we're changing the values
+            self.leision_mask = np.flipud(msg["mask"].copy())
 
     def OnUpdatePatient(self, msg):
         """Update and load the patient data."""
@@ -464,12 +467,13 @@ class plugin2DView(wx.Panel):
 
     def GetOpacityMask(self, index: int, opacity=0.7) -> Image:
         """The mask returned specify the opacity only,
-        the color is determined in composition """
+        the color is determined during composition """
         if self.leision_mask is None:
-            # use random data if mask is not present
+            # use random data if lesion mask is not present
             imdata = self.images[index].GetImageData()
             return generate_random_overlay((imdata["rows"], imdata["columns"]))
 
+        # use copy as we're changing the values
         npy = self.leision_mask[index].copy()
         # map all category (non-zero value) to 255, apply opacity
         OPACITY = int(255 * opacity)
