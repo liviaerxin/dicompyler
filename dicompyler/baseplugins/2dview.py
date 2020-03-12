@@ -86,6 +86,7 @@ class plugin2DView(wx.Panel):
         self.xpos = 0
         self.ypos = 0
         self.leision_mask = None
+        self.leision_mask_opacity = 0.7
         self.mousepos = wx.Point(-10000, -10000)
         self.mouse_in_window = False
         self.isodose_line_style = "Solid"
@@ -102,6 +103,8 @@ class plugin2DView(wx.Panel):
         zoominbmp = wx.Bitmap(util.GetResourcePath("magnifier_zoom_in.png"))
         zoomoutbmp = wx.Bitmap(util.GetResourcePath("magnifier_zoom_out.png"))
         toolsbmp = wx.Bitmap(util.GetResourcePath("cog.png"))
+        opacityincbmp = wx.Bitmap(util.GetResourcePath("opacity_increase.png"))
+        opacitydecbmp = wx.Bitmap(util.GetResourcePath("opacity_decrease.png"))
         self.tools = []
         self.tools.append(
             {
@@ -117,6 +120,22 @@ class plugin2DView(wx.Panel):
                 "bmp": zoomoutbmp,
                 "shortHelp": "Zoom Out",
                 "eventhandler": self.OnZoomOut,
+            }
+        )
+        self.tools.append(
+            {
+                "label": "Opacity +",
+                "bmp": opacityincbmp,
+                "shortHelp": "Increase Lesion Opacity",
+                "eventhandler": self.OnOpacityIncrease,
+            }
+        )
+        self.tools.append(
+            {
+                "label": "Opacity -",
+                "bmp": opacitydecbmp,
+                "shortHelp": "Decrease Lesion Opacity",
+                "eventhandler": self.OnOpacityDecrease,
             }
         )
         self.tools.append(
@@ -465,7 +484,7 @@ class plugin2DView(wx.Panel):
         y = (np.array(doselut[1]) - pixlut[1][0]) * prone / spacing[1]
         return (x, y)
 
-    def GetOpacityMask(self, index: int, opacity=0.7) -> Image:
+    def GetOpacityMask(self, index: int) -> Image:
         """The mask returned specify the opacity only,
         the color is determined during composition """
         if self.leision_mask is None:
@@ -476,7 +495,7 @@ class plugin2DView(wx.Panel):
         # use copy as we're changing the values
         npy = self.leision_mask[index].copy()
         # map all category (non-zero value) to 255, apply opacity
-        OPACITY = int(255 * opacity)
+        OPACITY = int(255 * self.leision_mask_opacity)
         npy[np.nonzero(npy)] = OPACITY
         return Image.fromarray(npy, mode="L")
 
@@ -594,6 +613,8 @@ class plugin2DView(wx.Panel):
             else:
                 zoom = "%.3f" % self.zoom
             imzoom = "Zoom: " + zoom + ":1"
+            # kylee: also print opacity
+            imzoom += "  Lesion Opacity: " + "%.1f" % self.leision_mask_opacity
             gc.DrawText(imzoom, 10, height - 17)
             imsize = "Image Size: " + str(self.bheight) + "x" + str(self.bwidth) + " px"
             gc.DrawText(imsize, 10, height - 17 - te[1] * 1.1)
@@ -729,6 +750,14 @@ class plugin2DView(wx.Panel):
         if self.zoom > 1:
             self.zoom = self.zoom / 1.1
             self.Refresh()
+
+    def OnOpacityIncrease(self, evt):
+        self.leision_mask_opacity = min(round(self.leision_mask_opacity + 0.1, 1), 1)
+        self.Refresh()
+
+    def OnOpacityDecrease(self, evt):
+        self.leision_mask_opacity = max(round(self.leision_mask_opacity - 0.1, 1), 0)
+        self.Refresh()
 
     def OnKeyDown(self, evt):
         """Change the image when the user presses the appropriate keys."""
