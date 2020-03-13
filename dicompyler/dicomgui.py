@@ -831,8 +831,14 @@ class DicomImporterDialog(wx.Dialog):
                     unsortednums.append(image.data_element(sort).value)
 
             # Sort image numbers in descending order for head first patients
-            if ("hf" in image.PatientPosition.lower()) and (sort == "IPP"):
-                sortednums = sorted(unsortednums, reverse=True)
+            if sort == "IPP":
+                if ("PatientPosition" in image) and  ("hf" in image.PatientPosition.lower()):
+                    sortednums = sorted(unsortednums, reverse=True)
+                else:
+                    # TODO: handle image sorting by `ImagePositionPatient` when image object has no attribute 'PatientPosition'
+                    # print(image.ImagePositionPatient)
+                    sortednums = sorted(unsortednums)
+            
             # Otherwise sort image numbers in ascending order
             else:
                 sortednums = sorted(unsortednums)

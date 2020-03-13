@@ -32,7 +32,7 @@ from dicompyler import plugin, preferences
 
 from dicompyler.hist_panel import HistPanel
 from dicompyler.lesion_statistics_panel import LesionStatisticsPanel
-
+from dicompyler.lung_statistics_panel import LungStatisticsPanel
 
 class MainFrame(wx.Frame):
     def __init__(self, parent, id, title, res):
@@ -143,11 +143,15 @@ class MainFrame(wx.Frame):
 
         """NotebookStatistics
             1. add lesion statistics panel
+            2. add lung statistics panel
         """
         self.notebookStatistics = XRCCTRL(self, "notebookStatistics")
 
         self.lesionStatisticsPanel = LesionStatisticsPanel(self.notebookStatistics)
         self.notebookStatistics.AddPage(self.lesionStatisticsPanel, "Lesion Statistic")
+        
+        self.lungStatisticsPanel = LungStatisticsPanel(self.notebookStatistics)
+        self.notebookStatistics.AddPage(self.lungStatisticsPanel, "Whole Lung Analysis")
 
         """Hide the left sizer"""
         self.leftSizer = self.panelGeneral.GetSizer()

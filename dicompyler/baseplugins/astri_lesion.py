@@ -109,7 +109,7 @@ class pluginTest(wx.Panel):
         Arguments:
             file {str} -- [description]
         """
-        time.sleep(0.01)
+        time.sleep(0.001)
 
     def analyze_files_thread(self, files: List[str], progressFunc):
         length = len(files)

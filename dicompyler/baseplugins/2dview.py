@@ -474,8 +474,15 @@ class plugin2DView(wx.Panel):
         y = []
         # Determine if the patient is prone or supine
         imdata = self.images[self.imagenum - 1].GetImageData()
-        prone = -1 if "p" in imdata["patientposition"].lower() else 1
-        feetfirst = -1 if "ff" in imdata["patientposition"].lower() else 1
+
+        if  "patientposition" in imdata:
+            prone = -1 if "p" in imdata["patientposition"].lower() else 1
+            feetfirst = -1 if "ff" in imdata["patientposition"].lower() else 1
+        else:
+            # TODO: handle `prone` and `feetfirst` when imdata has not attribute `patientposition`
+            prone = -1
+            feetfirst = -1
+
         # Get the pixel spacing
         spacing = imdata["pixelspacing"]
 
@@ -569,15 +576,18 @@ class plugin2DView(wx.Panel):
             self.z = "%.2f" % imdata["position"][2]
 
             # Determine whether the patient is prone or supine
-            if "p" in imdata["patientposition"].lower():
+            prone = False
+            if ("patientposition" in imdata) and ("p" in imdata["patientposition"].lower()):
                 prone = True
-            else:
-                prone = False
+            # TODO: handle `prone` when imdata has not attribute `patientposition`
+
             # Determine whether the patient is feet first or head first
-            if "ff" in imdata["patientposition"].lower():
+            feetfirst = False
+            if ("patientposition" in imdata) and ("ff" in imdata["patientposition"].lower()):
                 feetfirst = True
-            else:
-                feetfirst = False
+
+            # TODO: handle `feetfirst` when imdata has not attribute `patientposition`
+
             for id, structure in self.structures.items():
                 self.DrawStructure(structure, gc, self.z, prone, feetfirst)
 
@@ -621,10 +631,15 @@ class plugin2DView(wx.Panel):
             imwinlevel = "W/L: " + str(self.window) + " / " + str(self.level)
             te = gc.GetFullTextExtent(imwinlevel)
             gc.DrawText(imwinlevel, width - te[0] - 7, 7)
-            impatpos = "Patient Position: " + imdata["patientposition"]
-            te = gc.GetFullTextExtent(impatpos)
-            gc.DrawText(impatpos, width - te[0] - 7, height - 17)
 
+            if "patientposition" in imdata:
+                impatpos = "Patient Position: " + imdata["patientposition"]
+                te = gc.GetFullTextExtent(impatpos)
+                gc.DrawText(impatpos, width - te[0] - 7, height - 17)
+            else:
+                # TODO: handle gc draw when imdata has not attribute `patientposition`
+                print("has no attribute patientposition")
+            
             # Send message with the current image number and various properties
             pub.sendMessage(
                 "2dview.updated.image",
