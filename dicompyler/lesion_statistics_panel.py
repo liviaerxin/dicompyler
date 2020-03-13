@@ -54,19 +54,21 @@ mock_data1 = [
 ]
 
 COLUMN = [
-    {"name": "No.", "key": "id"},
-    {"name": "Pattern", "key": "pattern"},
-    {"name": "Slices", "key": "slices"},
-    {"name": "Volume(%)", "key": "volume"},
-    {"name": "Density(HU)", "key": "density"},
-    {"name": "Location", "key": "location"},
+    {"label": "No.", "key": "id"},
+    {"label": "Pattern", "key": "pattern"},
+    {"label": "Slices", "key": "slices"},
+    {"label": "Volume(%)", "key": "volume"},
+    {"label": "Density(HU)", "key": "density"},
+    {"label": "Location", "key": "location"},
 ]
 
 
 def pre_process_data(data: List):
+    result = []
     for item in data:
+        row = {}
         # combine `start_slice` and `end_slice` to `slice`
-        item["slices"] = "-".join(
+        row["slices"] = "-".join(
             [
                 str(item["start_slice"]),
                 str(item["representative_slice"]),
@@ -75,10 +77,13 @@ def pre_process_data(data: List):
         )
 
         # convert to str
-        item["id"] = str(item["id"])
-        item["volume"] = str(item["volume"])
-        item["density"] = str(item["density"])
-
+        row["id"] = str(item["id"])
+        row["pattern"] = str(item["pattern"])
+        row["location"] = str(item["location"])
+        row["volume"] = str(item["volume"])
+        row["density"] = str(item["density"])
+        result.append(row)
+    return result
 
 class SortedListCtrl(
     wx.ListCtrl, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin,
@@ -103,7 +108,7 @@ class LesionStatisticsPanel(wx.Panel):
         self.list = SortedListCtrl(self)
 
         for i, col in enumerate(COLUMN):
-            self.list.InsertColumn(i, col["name"])
+            self.list.InsertColumn(i, col["label"])
 
         # Font size
         # self.list.SetFont(wx.Font(wx.FontInfo(10)))
@@ -120,9 +125,9 @@ class LesionStatisticsPanel(wx.Panel):
         self.list.DeleteAllItems()
 
         idx = 0
-        pre_process_data(data)
+        items = pre_process_data(data)
 
-        for item in data:
+        for item in items:
 
             index = self.list.InsertItem(idx, item["id"])
             self.list.SetItem(index, 1, item["pattern"])
@@ -139,7 +144,7 @@ class LesionStatisticsPanel(wx.Panel):
         # TODO: real data instead of mock data
 
         # data = [mock_data, mock_data1][randint(0, 1)]
-        with open(util.GetResourcePath("lung_stats.json")) as f:
+        with open(util.GetResourcePath("PA373_ST1_SE2.json")) as f:
             data = json.load(f)["lesion_list"]
 
         self.update_lesion_list(data)
