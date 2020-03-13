@@ -54,6 +54,9 @@
   image.ImagePositionPatient, image.InstanceNumber, image.AcquisitionNumber
   ```
 
+- DICOM images sort  
+   [DICOM Slice Ordering](https://stackoverflow.com/questions/6597843/dicom-slice-ordering)
+
 ## Workarounds
 
 1. wx.StaticText set `wrap` with -1 to disable wrapping
