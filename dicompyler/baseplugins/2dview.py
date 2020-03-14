@@ -198,10 +198,9 @@ class plugin2DView(wx.Panel):
     def OnLesionMaskLoaded(self, msg):
         """Save mask locally."""
         if "mask" in msg:
-            # HACK: the order of `.npy` of reverse of our image order
-            # it should be "head first"
             # use copy as we're changing the values
-            self.leision_mask = np.flipud(msg["mask"].copy())
+            self.leision_mask = msg["mask"].copy()
+            self.Refresh()
 
     def OnUpdatePatient(self, msg):
         """Update and load the patient data."""
@@ -322,7 +321,6 @@ class plugin2DView(wx.Panel):
 
     def DrawStructure(self, structure, gc, position, prone, feetfirst):
         """Draw the given structure on the panel."""
-        print("yyyyy")
         # Create an indexing array of z positions of the structure data
         # to compare with the image z position
         if not "zarray" in structure:
@@ -363,7 +361,7 @@ class plugin2DView(wx.Panel):
             # Create the path for the contour
             path = gc.CreatePath()
             for contour in structure["planes"][list(structure["zkeys"])[index]]:
-                if contour["type"] == u"CLOSED_PLANAR":
+                if contour["type"] == "CLOSED_PLANAR":
                     # Convert the structure data to pixel data
                     pixeldata = self.GetContourPixelData(
                         self.structurepixlut, contour["data"], prone, feetfirst
@@ -468,14 +466,13 @@ class plugin2DView(wx.Panel):
 
     def GetDoseGridPixelData(self, pixlut, doselut):
         """Convert dosegrid data into pixel data using the dose to pixel LUT."""
-        print("Xxx")
         dosedata = []
         x = []
         y = []
         # Determine if the patient is prone or supine
         imdata = self.images[self.imagenum - 1].GetImageData()
 
-        if  "patientposition" in imdata:
+        if "patientposition" in imdata:
             prone = -1 if "p" in imdata["patientposition"].lower() else 1
             feetfirst = -1 if "ff" in imdata["patientposition"].lower() else 1
         else:
@@ -494,6 +491,9 @@ class plugin2DView(wx.Panel):
     def GetOpacityMask(self, index: int) -> Image:
         """The mask returned specify the opacity only,
         the color is determined during composition """
+        # print(
+        #     f"GetOpacityMask({index}, {self.leision_mask_opacity}) {self.leision_mask is None}"
+        # )
         if self.leision_mask is None:
             # use random data if lesion mask is not present
             imdata = self.images[index].GetImageData()
@@ -501,6 +501,7 @@ class plugin2DView(wx.Panel):
 
         # use copy as we're changing the values
         npy = self.leision_mask[index].copy()
+        # print(index, npy.shape, npy.dtype)
         # map all category (non-zero value) to 255, apply opacity
         OPACITY = int(255 * self.leision_mask_opacity)
         npy[np.nonzero(npy)] = OPACITY
@@ -577,13 +578,17 @@ class plugin2DView(wx.Panel):
 
             # Determine whether the patient is prone or supine
             prone = False
-            if ("patientposition" in imdata) and ("p" in imdata["patientposition"].lower()):
+            if ("patientposition" in imdata) and (
+                "p" in imdata["patientposition"].lower()
+            ):
                 prone = True
             # TODO: handle `prone` when imdata has not attribute `patientposition`
 
             # Determine whether the patient is feet first or head first
             feetfirst = False
-            if ("patientposition" in imdata) and ("ff" in imdata["patientposition"].lower()):
+            if ("patientposition" in imdata) and (
+                "ff" in imdata["patientposition"].lower()
+            ):
                 feetfirst = True
 
             # TODO: handle `feetfirst` when imdata has not attribute `patientposition`
@@ -638,8 +643,9 @@ class plugin2DView(wx.Panel):
                 gc.DrawText(impatpos, width - te[0] - 7, height - 17)
             else:
                 # TODO: handle gc draw when imdata has not attribute `patientposition`
-                print("has no attribute patientposition")
-            
+                # print("has no attribute patientposition")
+                pass
+
             # Send message with the current image number and various properties
             pub.sendMessage(
                 "2dview.updated.image",

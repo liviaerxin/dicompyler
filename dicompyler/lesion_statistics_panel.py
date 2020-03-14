@@ -85,6 +85,7 @@ def pre_process_data(data: List):
         result.append(row)
     return result
 
+
 class SortedListCtrl(
     wx.ListCtrl, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin,
 ):

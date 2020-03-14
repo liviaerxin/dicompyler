@@ -123,9 +123,13 @@ class pluginTest(wx.Panel):
         wx.CallAfter(progressFunc, length, length, "Done")
 
         # Mock lesion mask
-        maskpath = util.GetResourcePath("TCGA-17-Z019.npy")
+        if length == 307:
+            maskpath = util.GetResourcePath("PA373_ST1_SE2_mask.npy")
+        elif length == 59:
+            maskpath = util.GetResourcePath("TCGA-17-Z019.npy")
         if path.isfile(maskpath):
             mask: np.ndarray = np.load(maskpath)
+            print(f"Loaded mask[{maskpath}]: {mask.shape}")
             # mask.shape: (Z, X, Y)
             pub.sendMessage("lesion.loaded.mask", msg={"mask": mask})
 

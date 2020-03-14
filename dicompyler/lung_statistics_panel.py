@@ -60,6 +60,7 @@ def pre_process_data(data: Dict):
 
     return result
 
+
 class SortedListCtrl(
     wx.ListCtrl, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin,
 ):
@@ -110,9 +111,8 @@ class LungStatisticsPanel(wx.Panel):
             self.list.SetItemData(index, idx)
             idx += 1
 
-
     def OnUpdateLesion(self, msg):
-        print("Update Patient Lesion Statistics Panel")
+        print("Update Lung Lesion Statistics Panel")
 
         # TODO: real data instead of mock data
 

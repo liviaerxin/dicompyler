@@ -823,6 +823,9 @@ class DicomImporterDialog(wx.Dialog):
                 elif not (images[0].AcquisitionNumber == images[1].AcquisitionNumber):
                     sort = "AcquisitionNumber"
 
+            # kylee: print sorting info
+            print(f"parallel[{parallel}] sort[{sort}]")
+
             # Add the sort descriptor to a list to be sorted
             for i, image in enumerate(images):
                 if sort == "IPP":
@@ -837,15 +840,13 @@ class DicomImporterDialog(wx.Dialog):
                     # TODO: set the default `PatientPosition`
                     image.PatientPosition = "HFS"
 
-            # # Sort image numbers in descending order for head first patients
-            # if ("hf" in image.PatientPosition.lower()) and (sort == "IPP"):
-            #     sortednums = sorted(unsortednums, reverse=True)
-            # # Otherwise sort image numbers in ascending order
-            # else:
-            #     sortednums = sorted(unsortednums)
-
-            # Always sort image numbers in ascending order
-            sortednums = sorted(unsortednums)
+            # Sort image numbers in descending order for head first patients
+            # kylee: Always sort image numbers in ascending order
+            if False and ("hf" in image.PatientPosition.lower()) and (sort == "IPP"):
+                sortednums = sorted(unsortednums, reverse=True)
+            # Otherwise sort image numbers in ascending order
+            else:
+                sortednums = sorted(unsortednums)
 
             # Add the images to the array based on the sorted order
             for s, slice in enumerate(sortednums):
