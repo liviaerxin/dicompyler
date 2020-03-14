@@ -55,7 +55,8 @@
   ```
 
 - DICOM images sort  
-   [DICOM Slice Ordering](https://stackoverflow.com/questions/6597843/dicom-slice-ordering)
+  [DICOM Slice Ordering](https://stackoverflow.com/questions/6597843/dicom-slice-ordering)
+  [DICOM is Easy: Getting Oriented using the Image Plane Module](https://dicomiseasy.blogspot.com/2013/06/getting-oriented-using-image-plane.html)
 
 ## Workarounds
 
