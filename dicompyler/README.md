@@ -55,7 +55,10 @@
   ```
 
 - DICOM images sort  
-   [DICOM Slice Ordering](https://stackoverflow.com/questions/6597843/dicom-slice-ordering)
+   [DICOM Slice Ordering](https://stackoverflow.com/questions/6597843/dicom-slice-ordering)  
+   [DICOM: relating Slice Location to Image Orientation and Patient Position](https://stackoverflow.com/questions/40138092/dicom-relating-slice-location-to-image-orientation-and-patient-position)  
+   [DICOM: understanding the relationship between Patient Position (0018,5100) Image Orientation (Patient) (0020,0037)](https://stackoverflow.com/questions/40115444/dicom-understanding-the-relationship-between-patient-position-0018-5100-image)  
+
 
 ## Workarounds
 
