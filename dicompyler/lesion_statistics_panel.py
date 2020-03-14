@@ -72,7 +72,7 @@ def pre_process_data(data: List):
             [
                 str(item["start_slice"]),
                 str(item["representative_slice"]),
-                str(item["end_slice"]),
+                str(item["start_slice"]),
             ]
         )
 
@@ -82,6 +82,9 @@ def pre_process_data(data: List):
         row["location"] = str(item["location"])
         row["volume"] = str(item["volume"])
         row["density"] = str(item["density"])
+        row["start_slice"] = str(item["start_slice"])
+        row["start_slice"] = str(item["start_slice"])
+        row["representative_slice"] = str(item["representative_slice"])
         result.append(row)
     return result
 
@@ -118,6 +121,11 @@ class LesionStatisticsPanel(wx.Panel):
         hbox.Add(self.list, 1, wx.EXPAND)
         self.SetSizer(hbox)
 
+
+        # Bind interface events to the proper methods
+        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnItemActivated, self.list)
+        
+        
         # Set up pubsub
         pub.subscribe(self.OnUpdateLesion, "lesion.loaded.analysis")
 
@@ -125,19 +133,24 @@ class LesionStatisticsPanel(wx.Panel):
 
         self.list.DeleteAllItems()
 
-        idx = 0
-        items = pre_process_data(data)
-
-        for item in items:
-
-            index = self.list.InsertItem(idx, item["id"])
+        self.items = pre_process_data(data)
+        
+        for i, item in enumerate(self.items):
+            index = self.list.InsertItem(i, item["id"])
             self.list.SetItem(index, 1, item["pattern"])
             self.list.SetItem(index, 2, item["slices"])
             self.list.SetItem(index, 3, item["volume"])
             self.list.SetItem(index, 4, item["density"])
             self.list.SetItem(index, 5, item["location"])
-            self.list.SetItemData(index, idx)
-            idx += 1
+
+    def OnItemActivated(self, msg):
+        print("List Item Activated")
+        #print(msg.GetIndex())
+        print(self.items[msg.GetIndex()])
+        item = self.items[msg.GetIndex()]
+        
+        pub.sendMessage("2dview.toslice", msg={"slice": item["representative_slice"]})
+
 
     def OnUpdateLesion(self, msg):
         print("Update Patient Lesion Statistics Panel")

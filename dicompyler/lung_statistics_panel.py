@@ -100,16 +100,13 @@ class LungStatisticsPanel(wx.Panel):
 
         self.list.DeleteAllItems()
 
-        idx = 0
-        items = pre_process_data(data)
+        self.items = pre_process_data(data)
 
-        for item in items:
-            index = self.list.InsertItem(idx, item["label"])
+        for i, item in enumerate(self.items):
+            index = self.list.InsertItem(i, item["label"])
             self.list.SetItem(index, 1, item["whole"])
             self.list.SetItem(index, 2, item["right"])
             self.list.SetItem(index, 3, item["left"])
-            self.list.SetItemData(index, idx)
-            idx += 1
 
     def OnUpdateLesion(self, msg):
         print("Update Lung Lesion Statistics Panel")
