@@ -322,7 +322,7 @@ class plugin2DView(wx.Panel):
 
     def DrawStructure(self, structure, gc, position, prone, feetfirst):
         """Draw the given structure on the panel."""
-
+        print("yyyyy")
         # Create an indexing array of z positions of the structure data
         # to compare with the image z position
         if not "zarray" in structure:
@@ -468,7 +468,7 @@ class plugin2DView(wx.Panel):
 
     def GetDoseGridPixelData(self, pixlut, doselut):
         """Convert dosegrid data into pixel data using the dose to pixel LUT."""
-
+        print("Xxx")
         dosedata = []
         x = []
         y = []
