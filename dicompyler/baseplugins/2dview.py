@@ -193,6 +193,7 @@ class plugin2DView(wx.Panel):
         pub.subscribe(self.OnDrawingPrefsChange, "2dview.drawingprefs")
         pub.subscribe(self.OnPluginLoaded, "plugin.loaded.2dview")
         pub.subscribe(self.OnLesionMaskLoaded, "lesion.loaded.mask")
+        pub.subscribe(self.OnGoToSlice, "2dview.goto_slice")
         pub.sendMessage("preferences.requested.values", msg="2dview.drawingprefs")
 
     def OnLesionMaskLoaded(self, msg):
@@ -201,6 +202,15 @@ class plugin2DView(wx.Panel):
             # use copy as we're changing the values
             self.leision_mask = msg["mask"].copy()
             self.Refresh()
+
+    def OnGoToSlice(self, msg):
+        """Goto a particular slice."""
+        if "slice" in msg:
+            print(msg)
+            gotonum: int = msg["slice"]
+            if 1 <= gotonum <= len(self.images):
+                self.imagenum = gotonum
+                self.Refresh()
 
     def OnUpdatePatient(self, msg):
         """Update and load the patient data."""

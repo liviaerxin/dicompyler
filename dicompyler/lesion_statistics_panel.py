@@ -121,11 +121,9 @@ class LesionStatisticsPanel(wx.Panel):
         hbox.Add(self.list, 1, wx.EXPAND)
         self.SetSizer(hbox)
 
-
         # Bind interface events to the proper methods
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnItemActivated, self.list)
-        
-        
+
         # Set up pubsub
         pub.subscribe(self.OnUpdateLesion, "lesion.loaded.analysis")
 
@@ -134,7 +132,7 @@ class LesionStatisticsPanel(wx.Panel):
         self.list.DeleteAllItems()
 
         self.items = pre_process_data(data)
-        
+
         for i, item in enumerate(self.items):
             index = self.list.InsertItem(i, item["id"])
             self.list.SetItem(index, 1, item["pattern"])
@@ -145,12 +143,14 @@ class LesionStatisticsPanel(wx.Panel):
 
     def OnItemActivated(self, msg):
         print("List Item Activated")
-        #print(msg.GetIndex())
+        # print(msg.GetIndex())
         print(self.items[msg.GetIndex()])
         item = self.items[msg.GetIndex()]
-        
-        pub.sendMessage("2dview.toslice", msg={"slice": item["representative_slice"]})
 
+        # FIX: the values of `item` are strings?
+        pub.sendMessage(
+            "2dview.goto_slice", msg={"slice": int(item["representative_slice"])}
+        )
 
     def OnUpdateLesion(self, msg):
         print("Update Patient Lesion Statistics Panel")
