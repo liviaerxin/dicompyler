@@ -1,0 +1,53 @@
+{
+    "lesion_count": 2,
+    "lesion_list": [
+        {
+            "start_slice": 7,
+            "density": -689.71,
+            "id": 1,
+            "percentage": 0.0041,
+            "pattern": "GGO",
+            "end_slice": 10,
+            "location": "left",
+            "volume": 0.22,
+            "representative_slice": 4
+        },
+        {
+            "start_slice": 58,
+            "density": -686.34,
+            "id": 2,
+            "percentage": 0.251,
+            "pattern": "GGO",
+            "end_slice": 88,
+            "location": "left",
+            "volume": 13.44,
+            "representative_slice": 17
+        }
+    ],
+    "whole_lung_analysis": [
+        {
+            "type": "density",
+            "whole": -817.98,
+            "left": -817.08,
+            "right": -818.75
+        },
+        {
+            "type": "infection_percentage",
+            "whole": 0.255,
+            "left": 0.5559,
+            "right": 0.0
+        },
+        {
+            "type": "volume",
+            "whole": 5356.45,
+            "left": 2457.46,
+            "right": 2898.98
+        },
+        {
+            "type": "infection_volume",
+            "whole": 13.66,
+            "left": 13.66,
+            "right": 0
+        }
+    ]
+}

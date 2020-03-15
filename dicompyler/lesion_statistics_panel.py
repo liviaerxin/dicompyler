@@ -76,15 +76,15 @@ def pre_process_data(data: List):
             ]
         )
 
-        # convert to str
-        row["id"] = str(item["id"])
-        row["pattern"] = str(item["pattern"])
-        row["location"] = str(item["location"])
-        row["volume"] = str(item["volume"])
-        row["density"] = str(item["density"])
-        row["start_slice"] = str(item["start_slice"])
-        row["start_slice"] = str(item["start_slice"])
-        row["representative_slice"] = str(item["representative_slice"])
+        # copy
+        row["id"] = item["id"]
+        row["pattern"] = item["pattern"]
+        row["location"] = item["location"]
+        row["volume"] = item["volume"]
+        row["density"] = item["density"]
+        row["start_slice"] = item["start_slice"]
+        row["end_slice"] = item["end_slice"]
+        row["representative_slice"] = item["representative_slice"]
         result.append(row)
     return result
 
@@ -134,12 +134,12 @@ class LesionStatisticsPanel(wx.Panel):
         self.items = pre_process_data(data)
 
         for i, item in enumerate(self.items):
-            index = self.list.InsertItem(i, item["id"])
-            self.list.SetItem(index, 1, item["pattern"])
-            self.list.SetItem(index, 2, item["slices"])
-            self.list.SetItem(index, 3, item["volume"])
-            self.list.SetItem(index, 4, item["density"])
-            self.list.SetItem(index, 5, item["location"])
+            index = self.list.InsertItem(i, str(item["id"]))
+            self.list.SetItem(index, 1, str(item["pattern"]))
+            self.list.SetItem(index, 2, str(item["slices"]))
+            self.list.SetItem(index, 3, str(item["volume"]))
+            self.list.SetItem(index, 4, str(item["density"]))
+            self.list.SetItem(index, 5, str(item["location"]))
 
     def OnItemActivated(self, msg):
         print("List Item Activated")
@@ -147,9 +147,8 @@ class LesionStatisticsPanel(wx.Panel):
         print(self.items[msg.GetIndex()])
         item = self.items[msg.GetIndex()]
 
-        # FIX: the values of `item` are strings?
         pub.sendMessage(
-            "2dview.goto_slice", msg={"slice": int(item["representative_slice"])}
+            "2dview.goto_slice", msg={"slice": item["representative_slice"]}
         )
 
     def OnUpdateLesion(self, msg):

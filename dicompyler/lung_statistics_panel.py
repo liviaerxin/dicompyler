@@ -53,9 +53,9 @@ def pre_process_data(data: Dict):
             row = {}
             v = data[key]
             row["label"] = label
-            row["whole"] = str(v["whole"]) if "whole" in v else "None"
-            row["left"] = str(v["left"]) if "left" in v else "None"
-            row["right"] = str(v["right"]) if "right" in v else "None"
+            row["whole"] = v["whole"] if "whole" in v else None
+            row["left"] = v["left"] if "left" in v else None
+            row["right"] = v["right"] if "right" in v else None
             result.append(row)
 
     return result
@@ -103,10 +103,10 @@ class LungStatisticsPanel(wx.Panel):
         self.items = pre_process_data(data)
 
         for i, item in enumerate(self.items):
-            index = self.list.InsertItem(i, item["label"])
-            self.list.SetItem(index, 1, item["whole"])
-            self.list.SetItem(index, 2, item["right"])
-            self.list.SetItem(index, 3, item["left"])
+            index = self.list.InsertItem(i, str(item["label"]))
+            self.list.SetItem(index, 1, str(item["whole"]))
+            self.list.SetItem(index, 2, str(item["right"]))
+            self.list.SetItem(index, 3, str(item["left"]))
 
     def OnUpdateLesion(self, msg):
         print("Update Lung Lesion Statistics Panel")
