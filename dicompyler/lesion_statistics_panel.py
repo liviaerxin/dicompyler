@@ -72,7 +72,7 @@ def pre_process_data(data: List):
             [
                 str(item["start_slice"]),
                 str(item["representative_slice"]),
-                str(item["start_slice"]),
+                str(item["end_slice"]),
             ]
         )
 
@@ -104,6 +104,7 @@ class LesionStatisticsPanel(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
         wx.Panel.__init__(self, parent, *args, **kwargs)
 
+        print("Initialize Lesion Statistics Panel")
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
         # TODO: Initialize data visulization view(does it need?)
@@ -126,6 +127,12 @@ class LesionStatisticsPanel(wx.Panel):
 
         # Set up pubsub
         pub.subscribe(self.OnUpdateLesion, "lesion.loaded.analysis")
+
+    def OnDestroy(self, evt):
+        """Unbind to all events before the plugin is destroyed."""
+        print("Destroy Lesion Statistics Panel")
+
+        pub.unsubscribe(self.OnUpdateLesion, "lesion.loaded.analysis")
 
     def update_lesion_list(self, data):
 

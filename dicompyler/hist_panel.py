@@ -139,6 +139,7 @@ class HistPanel(wx.Panel):
         # self.add_toolbar()  # add as needed
 
         # Initialize controls
+        print("Initialize Histogram Panel")
 
         bSizer1 = wx.BoxSizer(wx.VERTICAL)
 
@@ -213,6 +214,11 @@ class HistPanel(wx.Panel):
 
         # Set up pubsub
         pub.subscribe(self.OnUpdateHistogram, "lesion.loaded.analysis")
+
+    def OnDestroy(self, evt):
+        """Unbind to all events before the window is destroyed."""
+        print("Destory Histogram Panel")
+        pub.unsubscribe(self.OnUpdateHistogram, "lesion.loaded.analysis")
 
 
     def plot_histogram_img(self, img: str):

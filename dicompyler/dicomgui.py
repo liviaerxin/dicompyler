@@ -833,8 +833,8 @@ class DicomImporterDialog(wx.Dialog):
                 else:
                     unsortednums.append(image.data_element(sort).value)
 
-                print(image.ImagePositionPatient)
-                print(image.ImageOrientationPatient)
+                #print(image.ImagePositionPatient)
+                #print(image.ImageOrientationPatient)
 
                 if "PatientPosition" not in image:
                     # TODO: set the default `PatientPosition`

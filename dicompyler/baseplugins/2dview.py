@@ -68,7 +68,7 @@ class plugin2DView(wx.Panel):
 
     def Init(self, res):
         """Method called after the panel has been initialized."""
-
+        print("Initialize plugin2DView")
         # Bind ui events to the proper methods
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_SIZE, self.OnSize)
@@ -207,6 +207,7 @@ class plugin2DView(wx.Panel):
         """Goto a particular slice."""
         if "slice" in msg:
             print(msg)
+            print(self)
             gotonum: int = msg["slice"]
             if 1 <= gotonum <= len(self.images):
                 self.imagenum = gotonum
@@ -286,14 +287,16 @@ class plugin2DView(wx.Panel):
         pub.unsubscribe(self.OnRefresh, "2dview.refresh")
 
     def OnDestroy(self, evt):
-        """Unbind to all events before the plugin is destroyed."""
+        """Unbind to all events before the plugin is dßestroyed."""
 
+        print("Destroy plugin2DView")
         pub.unsubscribe(self.OnUpdatePatient, "patient.updated.parsed_data")
         pub.unsubscribe(self.OnStructureCheck, "structures.checked")
         pub.unsubscribe(self.OnIsodoseCheck, "isodoses.checked")
         pub.unsubscribe(self.OnDrawingPrefsChange, "2dview.drawingprefs")
         pub.unsubscribe(self.OnPluginLoaded, "plugin.loaded.2dview")
         pub.unsubscribe(self.OnLesionMaskLoaded, "lesion.loaded.mask")
+        pub.unsubscribe(self.OnGoToSlice, "2dview.goto_slice")
         # self.OnUnfocus()
 
     def OnStructureCheck(self, msg):
