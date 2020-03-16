@@ -42,7 +42,9 @@
 
 - add WC/WW to `2dview` (toolbar button/right click drag/Control drag?) <https://www.radiantviewer.com/dicom-viewer-manual/change_brightness_contrast.html>
 
-* need to show Chinese? config matplot with Chinese font setting, title
+- need to show Chinese? config matplot with Chinese font setting, title
+
+- [ ] replace `print` with `logger`
 
 ## dicomplyer study
 

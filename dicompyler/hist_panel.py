@@ -364,27 +364,22 @@ class HistPanel(wx.Panel):
         self.toolbar.update()
 
     def OnUpdateHistogram(self, msg):
-        print(f"Update Patient Histogram Panel")
         """Update Histogram When Lesion Analysis Finish."""
-        # logger.info(msg)
+        print(f"Update Patient Histogram Panel")
 
-        try:
-            hist_data = msg["result"]["hist"]
+        # Mock data
+        # self.plot_histogram_back_to_back(
+        #     hist_data["HU"][:-1], None, hist_data["left"], hist_data["right"]
+        # )
 
-            """Plot Two back-to-back Histograms"""
-            # print(hist_data["HU"])
-            # print(hist_data["left"])
-            # print(hist_data["right"])
-            # TODO: process real data here, here is expected to get `counts` and `bins` directly by specific method provided by robin
-            # self.plot_histogram_back_to_back(
-            #     hist_data["HU"][:-1], None, hist_data["left"], hist_data["right"]
-            # )
+        if ("analysis" in msg) and ("histogram" in msg["analysis"]):
+            data = msg["analysis"]["histogram"]
             self.plot_histogram_line_by_line(
-                hist_data["HU"], hist_data["left"], hist_data["right"]
+                data["HU"], data["left"], data["right"]
             )
+        else:
+            print("no histogram data")
 
-        except KeyError:
-            print("no valid data to plot histogram!")
 
         """Plot Single Histogram"""
         # Mock data

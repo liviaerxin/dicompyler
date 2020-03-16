@@ -135,6 +135,6 @@ class pluginTest(wx.Panel):
 
         # Mock analysis result
         result = None
-        with open(util.GetResourcePath("lung_stats.json")) as f:
+        with open(util.GetResourcePath("PA373_ST1_SE2.json")) as f:
             result = json.load(f)
-            pub.sendMessage("lesion.loaded.analysis", msg={"result": result})
+            pub.sendMessage("lesion.loaded.analysis", msg={"analysis": result})

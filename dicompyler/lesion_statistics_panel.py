@@ -76,7 +76,7 @@ def pre_process_data(data: List):
             ]
         )
 
-        # copy
+        # copy data
         row["id"] = item["id"]
         row["pattern"] = item["pattern"]
         row["location"] = item["location"]
@@ -134,7 +134,7 @@ class LesionStatisticsPanel(wx.Panel):
 
         pub.unsubscribe(self.OnUpdateLesion, "lesion.loaded.analysis")
 
-    def update_lesion_list(self, data):
+    def update_list(self, data):
 
         self.list.DeleteAllItems()
 
@@ -161,14 +161,16 @@ class LesionStatisticsPanel(wx.Panel):
     def OnUpdateLesion(self, msg):
         print("Update Patient Lesion Statistics Panel")
 
-        # TODO: real data instead of mock data
-
+        # Mock Data
         # data = [mock_data, mock_data1][randint(0, 1)]
-        with open(util.GetResourcePath("PA373_ST1_SE2.json")) as f:
-            data = json.load(f)["lesion_list"]
+        # with open(util.GetResourcePath("PA373_ST1_SE2.json")) as f:
+        #     data = json.load(f)["lesion_list"]
 
-        self.update_lesion_list(data)
-
+        if ("analysis" in msg) and ("lesions" in msg["analysis"]):
+            data = msg["analysis"]["lesions"]
+            self.update_list(data)
+        else:
+            print("no lesions data")
 
 def run_LesionPanel():
     app = wx.App()

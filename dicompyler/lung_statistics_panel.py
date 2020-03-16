@@ -2,7 +2,7 @@ import wx
 import wx.lib.mixins.listctrl
 from pubsub import pub
 
-from typing import Dict
+from typing import List
 from random import randint
 import json
 
@@ -14,49 +14,36 @@ import logging, logging.handlers
 logger = logging.getLogger("dicompyler.lesion_panel")
 
 
-mock_data = {
-    "density": {"whole": -817.98, "left": -817.08, "right": -818.75},
-    "infection_volume": {"whole": 13.66, "left": 13.66, "right": 0},
-}
-
-mock_data1 = {
-    "density": {"whole": -817.98, "left": -817.08, "right": -818.75},
-    "infection_volume": {"whole": 13.66, "left": 13.66, "right": 0},
-    "volume": {"whole": 5356.45, "left": 2457.46, "right": 2898.98},
-    "infection_volume": {"whole": 0.255, "left": 0.5559, "right": 0.0},
-}
-
 COLUMN = [
     {
         "label": "",
-        "key": "item",
+        "key": "type",
         "width": 150,
-        "items": [
-            {"label": "Volume (cm3)", "key": "volume"},
-            {"label": "Density (HU)", "key": "density"},
-            {"label": "Infection Volume", "key": "infection_volume"},
-            {"label": "Infection Percentage", "key": "infection_volume"},
-        ],
     },
     {"label": "Whole Lung", "key": "whole", "width": 120,},
     {"label": "Right Lung", "key": "right", "width": 120,},
     {"label": "Left Lung", "key": "left", "width": 120,},
 ]
 
+TYPE_LABLES = {
+    "volume": "Volume (cm3)",
+    "density": "Density (HU)",
+    "infection_volume": "Infection Volume",
+    "infection_percentage": "Infection Percentage",
+}
 
-def pre_process_data(data: Dict):
+def pre_process_data(data: List):
     result = []
-    for item in COLUMN[0]["items"]:
-        key = item["key"]
-        label = item["label"]
-        if key in data:
-            row = {}
-            v = data[key]
-            row["label"] = label
-            row["whole"] = v["whole"] if "whole" in v else None
-            row["left"] = v["left"] if "left" in v else None
-            row["right"] = v["right"] if "right" in v else None
-            result.append(row)
+
+    # copy data
+    for item in data:
+        row = {}
+        row["type"] = item["type"] if "type" in item else None
+        row["whole"] = item["whole"] if "whole" in item else None
+        row["left"] = item["left"] if "left" in item else None
+        row["right"] = item["right"] if "right" in item else None
+
+        result.append(row)
 
     return result
 
@@ -103,7 +90,11 @@ class LungStatisticsPanel(wx.Panel):
         self.items = pre_process_data(data)
 
         for i, item in enumerate(self.items):
-            index = self.list.InsertItem(i, str(item["label"]))
+            if item["type"] in TYPE_LABLES:
+                label = TYPE_LABLES[item["type"]]
+            else:
+                label = item["type"]
+            index = self.list.InsertItem(i, str(label))
             self.list.SetItem(index, 1, str(item["whole"]))
             self.list.SetItem(index, 2, str(item["right"]))
             self.list.SetItem(index, 3, str(item["left"]))
@@ -111,10 +102,15 @@ class LungStatisticsPanel(wx.Panel):
     def OnUpdateLesion(self, msg):
         print("Update Lung Lesion Statistics Panel")
 
-        # TODO: real data instead of mock data
-
+        # Mock Data
         # data = [mock_data, mock_data1][randint(0, 1)]
-        with open(util.GetResourcePath("PA373_ST1_SE2.json")) as f:
-            data = json.load(f)
+        # with open(util.GetResourcePath("PA373_ST1_SE2.json")) as f:
+        #     data = json.load(f)
+        # self.update_list(data)
 
-        self.update_list(data)
+        if ("analysis" in msg) and ("whole_lung" in msg["analysis"]):
+            data = msg["analysis"]["whole_lung"]
+            self.update_list(data)
+        else:
+            print("no whole_lung data")
+

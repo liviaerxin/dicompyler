@@ -1,11 +1,5 @@
 {
-    "density": {
-        "whole": -817.98,
-        "left": -817.08,
-        "right": -818.75
-    },
-    "lesion_count": 2,
-    "hist": {
+    "histogram": {
         "left": [
             0.0,
             0.0,
@@ -437,7 +431,7 @@
             0.003
         ]
     },
-    "lesion_list": [
+    "lesions": [
         {
             "start_slice": 7,
             "density": -689.71,
@@ -461,20 +455,30 @@
             "representative_slice": 17
         }
     ],
-    "infection_volume": {
-        "whole": 13.66,
-        "left": 13.66,
-        "right": 0
-    },
-    "volume": {
-        "whole": 5356.45,
-        "left": 2457.46,
-        "right": 2898.98
-    },
-    "infection_percentage": {
-        "whole": 0.255,
-        "left": 0.5559,
-        "right": 0.0
-    },
-    "lesion_mask": ""
+    "whole_lung": [
+        {
+            "type": "volume",
+            "whole": 5356.45,
+            "left": 2457.46,
+            "right": 2898.98
+        },
+        {
+            "type": "density",
+            "whole": -817.98,
+            "left": -817.08,
+            "right": -818.75
+        },
+        {
+            "type": "infection_percentage",
+            "whole": 0.255,
+            "left": 0.5559,
+            "right": 0.0
+        },
+        {
+            "type": "infection_volume",
+            "whole": 13.66,
+            "left": 13.66,
+            "right": 0
+        }
+    ]
 }
