@@ -6,6 +6,11 @@
 2. Panel to show the lesion statistics list of each series.
 3. Lesion analysis
 
+also check code of `https://github.com/dicompyler/dicompyler-core` DICOM parsing (with `pydicom`) done here
+
+Refer to viewer on market:
+[Browsing series and images](https://www.radiantviewer.com/dicom-viewer-manual/browse_series_and_images.html)
+
 ## TODO Tasks
 
 - [x] replace `panelGeneral` with our algorithm output  
@@ -23,8 +28,6 @@
 - [x] remove `dicompyler/baseplugins/{dvh,quickopen,anonymize}.*` plugins  
        change the `plugin_version` to not load them
 
-- also check code of `https://github.com/dicompyler/dicompyler-core` DICOM parsing (with `pydicom`) done here
-
 - [x] are we using [wxWidgets/Phoenix](https://github.com/wxWidgets/Phoenix/)?
       Yes, after wxPython4.0.0a2 version, Phoenix is the improved next-generation wxPython
 
@@ -34,13 +37,21 @@
   - larger bin to make it a bar chart
   - show 2 back to back
 
-- [ ] change tab order, `2dview` first
+- [x] change tab order, `2dview` first
 
-- [ ] add overlay to `2dview`
-      random or load `resources/TCGA-17-Z019.npy`
-      need to figure out z order (feet first or head first)
+- [x] add overlay to `2dview`
+      load `.npy` from resources (not in git tree)
+      use Image Position Patient (ignoring head/feet first as that info is not always available)
 
-- add WC/WW to `2dview` (toolbar button/right click drag/Control drag?) <https://www.radiantviewer.com/dicom-viewer-manual/change_brightness_contrast.html>
+- [ ] add axes label (L/R/A/P) to `2dview`
+
+- [ ] allow input of WC/WW
+      add spin control to tool `2dview`'s tool?
+
+- [ ] add scroll bar to jump to instance
+      lesion should be highlighted and with `representative_slice` as thumbnail (maybe upon hover)
+
+- [ ] generate side views from series
 
 - need to show Chinese? config matplot with Chinese font setting, title
 
@@ -61,7 +72,7 @@
    [DICOM: relating Slice Location to Image Orientation and Patient Position](https://stackoverflow.com/questions/40138092/dicom-relating-slice-location-to-image-orientation-and-patient-position)  
    [DICOM: understanding the relationship between Patient Position (0018,5100) Image Orientation (Patient) (0020,0037)](https://stackoverflow.com/questions/40115444/dicom-understanding-the-relationship-between-patient-position-0018-5100-image)  
    [DICOM Slice Ordering](https://stackoverflow.com/questions/6597843/dicom-slice-ordering)  
-   [DICOM is Easy: Getting Oriented using the Image Plane Module](https://dicomiseasy.blogspot.com/2013/06/getting-oriented-using-image-plane.html)  
+   [DICOM is Easy: Getting Oriented using the Image Plane Module](https://dicomiseasy.blogspot.com/2013/06/getting-oriented-using-image-plane.html)
 
 ## Workarounds
 
