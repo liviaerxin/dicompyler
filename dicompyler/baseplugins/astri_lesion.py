@@ -122,6 +122,12 @@ class pluginTest(wx.Panel):
 
         wx.CallAfter(progressFunc, length, length, "Done")
 
+        # Mock analysis result
+        result = None
+        with open(util.GetResourcePath("PA373_ST1_SE2.json")) as f:
+            result = json.load(f)
+            pub.sendMessage("lesion.loaded.analysis", msg={"analysis": result})
+
         # Mock lesion mask
         if length == 307:
             maskpath = util.GetResourcePath("PA373_ST1_SE2_mask.npy")
@@ -132,9 +138,3 @@ class pluginTest(wx.Panel):
             print(f"Loaded mask[{maskpath}]: {mask.shape}")
             # mask.shape: (Z, X, Y)
             pub.sendMessage("lesion.loaded.mask", msg={"mask": mask})
-
-        # Mock analysis result
-        result = None
-        with open(util.GetResourcePath("PA373_ST1_SE2.json")) as f:
-            result = json.load(f)
-            pub.sendMessage("lesion.loaded.analysis", msg={"analysis": result})

@@ -18,18 +18,7 @@ from matplotlib import _cntr as cntr
 from matplotlib import __version__ as mplversion
 import numpy as np
 from dicompyler import guiutil, util
-import dicompylercore
 from PIL import Image
-
-
-def generate_random_overlay(size: tuple, threshold=0.7) -> Image:
-    """return a random image of size with patches of grayscale """
-    assert size[0] % 16 == 0 and size[1] % 16 == 0
-    qsize = (size[0] // 16, size[1] // 16)  # patch size = 1/16 of size
-    thresholding = np.vectorize(lambda x: 255 * x if x > threshold else 0)
-    Z = thresholding(np.random.random(qsize)).astype(np.uint8)
-    im = Image.fromarray(Z, mode="L").resize(size, resample=Image.NEAREST)
-    return im
 
 
 def pluginProperties():
@@ -503,19 +492,17 @@ class plugin2DView(wx.Panel):
 
     def GetOpacityMask(self, index: int) -> Image:
         """The mask returned specify the opacity only,
-        the color is determined during composition """
+        the color is determined during composition"""
         # print(
         #     f"GetOpacityMask({index}, {self.leision_mask_opacity}) {self.leision_mask is None}"
         # )
         if self.leision_mask is None:
-            # use random data if lesion mask is not present
-            imdata = self.images[index].GetImageData()
-            return generate_random_overlay((imdata["rows"], imdata["columns"]))
+            return None
 
         # use copy as we're changing the values
         npy = self.leision_mask[index].copy()
         # print(index, npy.shape, npy.dtype)
-        # map all category (non-zero value) to 255, apply opacity
+        # map all categories (non-zero values) to 255, apply opacity
         OPACITY = int(255 * self.leision_mask_opacity)
         npy[np.nonzero(npy)] = OPACITY
         return Image.fromarray(npy, mode="L")
@@ -562,15 +549,19 @@ class plugin2DView(wx.Panel):
                 gc.DrawRectangle(0, 0, width, height)
 
             ## add overlay
-            OVERLAY_COLOR = (255, 0, 0)
-            overlayed: Image = Image.composite(
-                OVERLAY_COLOR,
-                # need RGBA for composition
-                self.images[self.imagenum - 1]
-                .GetImage(self.window, self.level)
-                .convert("RGBA"),
-                mask=self.GetOpacityMask(self.imagenum - 1),
+            instance_image: Image = self.images[self.imagenum - 1].GetImage(
+                self.window, self.level
             )
+            mask = self.GetOpacityMask(self.imagenum - 1)
+            OVERLAY_COLOR = (255, 0, 0)
+            if mask:
+                overlayed: Image = Image.composite(
+                    OVERLAY_COLOR,  # pure color
+                    instance_image.convert("RGBA"),  # need RGBA for composition
+                    mask=mask,
+                )
+            else:
+                overlayed = instance_image
             ## add overlay end
             image = guiutil.convert_pil_to_wx(overlayed)
 
