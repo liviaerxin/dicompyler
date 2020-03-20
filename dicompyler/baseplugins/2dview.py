@@ -14,11 +14,8 @@ logger = logging.getLogger("dicompyler.2dview")
 import wx
 from wx.xrc import XmlResource, XRCCTRL, XRCID
 from pubsub import pub
-from matplotlib import _cntr as cntr
-from matplotlib import __version__ as mplversion
-import numpy as np
 from dicompyler.baseplugins.view2d import View2D
-from PIL import Image
+
 
 """
 Later, it will be depricated and replaced by "2dview_slider.py"
@@ -52,4 +49,3 @@ def pluginLoader(parent):
     panelView2D = View2D(parent)
 
     return panelView2D
-

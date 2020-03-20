@@ -15,11 +15,7 @@ logger = logging.getLogger("dicompyler.lesion_panel")
 
 
 COLUMN = [
-    {
-        "label": "",
-        "key": "type",
-        "width": 150,
-    },
+    {"label": "", "key": "type", "width": 150,},
     {"label": "Whole Lung", "key": "whole", "width": 120,},
     {"label": "Right Lung", "key": "right", "width": 120,},
     {"label": "Left Lung", "key": "left", "width": 120,},
@@ -31,6 +27,7 @@ TYPE_LABLES = {
     "infection_volume": "Infection Volume",
     "infection_percentage": "Infection Percentage",
 }
+
 
 def pre_process_data(data: List):
     result = []
@@ -113,4 +110,3 @@ class LungStatisticsPanel(wx.Panel):
             self.update_list(data)
         else:
             print("no whole_lung data")
-

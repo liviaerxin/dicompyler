@@ -4,6 +4,7 @@
 import wx
 from typing import List, Dict
 
+
 def fraction_to_value(fraction, min_value, max_value):
     return (max_value - min_value) * fraction + min_value
 
@@ -13,13 +14,13 @@ def value_to_fraction(value, min_value, max_value):
 
 
 class SliderThumb:
-    def __init__(self, parent, value: int, shape: str="circle"):
+    def __init__(self, parent, value: int, shape: str = "circle"):
         self.parent = parent
         self.dragged = False
         self.mouse_over = False
 
         track_height = self.parent.track_height
-        
+
         if shape == "arrow":
             self.shape = "arrow"
         else:
@@ -40,13 +41,12 @@ class SliderThumb:
             self.size = (max_coords[0] - min_coords[0], max_coords[1] - min_coords[1])
         elif self.shape == "circle":
             # circle thumb
-            self.thumb_circle_radius = int(track_height/2)
-            self.thumb_shadow_circle_radius = int(track_height/2) + 1
+            self.thumb_circle_radius = int(track_height / 2)
+            self.thumb_shadow_circle_radius = int(track_height / 2) + 1
             self.size = (track_height + 1, track_height + 1)
         else:
             print("unknown shape")
-        
-        
+
         self.value = value
 
         # thumb colour
@@ -94,7 +94,7 @@ class SliderThumb:
             self.SetValue(value)
         else:
             pos_y = pos[1]
-            
+
             # Limit movement by slider boundaries
             min_x = self.GetMin()
             max_x = self.GetMax()
@@ -105,7 +105,6 @@ class SliderThumb:
                 fraction, self.parent.GetMin(), self.parent.GetMax()
             )
             self.SetValue(value)
-
 
     def GetValue(self):
         return self.value
@@ -121,7 +120,7 @@ class SliderThumb:
         event = wx.PyCommandEvent(wx.EVT_SLIDER.typeId, self.parent.GetId())
         event.SetEventObject(self.parent)
         wx.PostEvent(self.parent.GetEventHandler(), event)
-        
+
         print(f"PostEvent {self.parent.GetValue()}")
 
     def GetMin(self):
@@ -188,14 +187,14 @@ class SliderThumb:
             )
         elif self.shape == "circle":
             dc.DrawCircle(
-                x=int(my_pos[0]),
-                y=int(my_pos[1]),
-                radius=self.thumb_circle_radius,
+                x=int(my_pos[0]), y=int(my_pos[1]), radius=self.thumb_circle_radius,
             )
+
 
 """
 Custom Widget
 """
+
 
 class MarkSlider(wx.Panel):
     def __init__(
@@ -223,18 +222,22 @@ class MarkSlider(wx.Panel):
             self.style = wx.SL_VERTICAL
         else:
             raise NotImplementedError("Styles not implemented")
-        
+
         if validator != wx.DefaultValidator:
             raise NotImplementedError("Validator not implemented")
-        
+
         # track height
         self.track_height = 12
 
         # min size
         if style == wx.SL_HORIZONTAL:
-            self.SetMinSize(size=(max(50, size[0]), max(self.track_height+4, size[1])))
+            self.SetMinSize(
+                size=(max(50, size[0]), max(self.track_height + 4, size[1]))
+            )
         else:
-            self.SetMinSize(size=(max(self.track_height+4, size[0]), max(50, size[1])))
+            self.SetMinSize(
+                size=(max(self.track_height + 4, size[0]), max(50, size[1]))
+            )
 
         # min/max value
         if minValue > maxValue:
@@ -249,7 +252,7 @@ class MarkSlider(wx.Panel):
 
         # border width
         self.border_width = border_width
-        
+
         # ranges
         self.ranges = []
 
@@ -272,7 +275,7 @@ class MarkSlider(wx.Panel):
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)
         self.Bind(wx.EVT_SIZE, self.OnResize)
-        
+
     def Enable(self, enable=True):
         super().Enable(enable)
         self.Refresh()
@@ -282,11 +285,11 @@ class MarkSlider(wx.Panel):
         self.Refresh()
 
     def SetValueFromMousePosition(self, click_pos):
-        #if self.thumb.dragged:
+        # if self.thumb.dragged:
         self.thumb.SetPosition(click_pos)
 
     def OnMouseDown(self, event):
-        #print(f"OnMouseDown {event}")
+        # print(f"OnMouseDown {event}")
         if not self.IsEnabled():
             return
         click_pos = event.GetPosition()
@@ -298,7 +301,7 @@ class MarkSlider(wx.Panel):
         self.Refresh()
 
     def OnMouseUp(self, event):
-        #print(f"OnMouseUp {event}")
+        # print(f"OnMouseUp {event}")
         if not self.IsEnabled():
             return
         self.SetValueFromMousePosition(event.GetPosition())
@@ -308,13 +311,13 @@ class MarkSlider(wx.Panel):
         self.Refresh()
 
     def OnMouseLost(self, event):
-        #print(f"OnMouseLost {event}")
+        # print(f"OnMouseLost {event}")
         self.thumb.dragged = False
         self.thumb.mouse_over = False
         self.Refresh()
 
     def OnMouseMotion(self, event):
-        #print(f"OnMouseMotion {event.GetPosition()}")
+        # print(f"OnMouseMotion {event.GetPosition()}")
         if not self.IsEnabled():
             return
         refresh_needed = False
@@ -331,7 +334,7 @@ class MarkSlider(wx.Panel):
             self.Refresh()
 
     def OnMouseEnter(self, event):
-        #print(f"OnMouseEnter {event}")
+        # print(f"OnMouseEnter {event}")
         if not self.IsEnabled():
             return
         mouse_pos = event.GetPosition()
@@ -340,7 +343,7 @@ class MarkSlider(wx.Panel):
             self.Refresh()
 
     def OnMouseLeave(self, event):
-        #print(f"OnMouseLeave {event}")
+        # print(f"OnMouseLeave {event}")
         if not self.IsEnabled():
             return
         self.thumb.mouse_over = False
@@ -351,7 +354,7 @@ class MarkSlider(wx.Panel):
 
     def OnPaint(self, event):
         w, h = self.GetSize()
-        #print(f"size: {w}*{h}")
+        # print(f"size: {w}*{h}")
         # BufferedPaintDC should reduce flickering
         dc = wx.BufferedPaintDC(self)
         background_brush = wx.Brush(self.GetBackgroundColour(), wx.SOLID)
@@ -363,7 +366,7 @@ class MarkSlider(wx.Panel):
 
         dc.SetPen(wx.Pen(self.slider_outline_color, width=1, style=wx.PENSTYLE_SOLID))
         dc.SetBrush(wx.Brush(self.slider_background_color, style=wx.BRUSHSTYLE_SOLID))
-        #print(f"w,h {w},{h}")
+        # print(f"w,h {w},{h}")
 
         if self.style == wx.SL_HORIZONTAL:
             slider_x = self.border_width
@@ -377,13 +380,11 @@ class MarkSlider(wx.Panel):
             slider_h = int(h - 2 * self.border_width)
 
         dc.DrawRectangle(slider_x, slider_y, slider_w, slider_h)
-        
+
         # 2. Draw ranges
         if self.IsEnabled():
             dc.SetPen(
-                wx.Pen(
-                    self.range_outline_color, width=1, style=wx.PENSTYLE_SOLID
-                )
+                wx.Pen(self.range_outline_color, width=1, style=wx.PENSTYLE_SOLID)
             )
             dc.SetBrush(wx.Brush(self.range_color, style=wx.BRUSHSTYLE_SOLID))
         else:
@@ -392,23 +393,26 @@ class MarkSlider(wx.Panel):
             )
             dc.SetBrush(wx.Brush(self.slider_outline_color, style=wx.BRUSHSTYLE_SOLID))
 
-
         min_value = self.GetMin()
         max_value = self.GetMax()
 
         if self.style == wx.SL_HORIZONTAL:
             min_pos = self.border_width
-            max_pos = w -self.border_width
+            max_pos = w - self.border_width
         else:
             min_pos = self.border_width
-            max_pos = h -self.border_width
+            max_pos = h - self.border_width
 
         for r in self.ranges:
             start_value = r["start_value"]
             end_value = r["end_value"]
-            start_pos = fraction_to_value(value_to_fraction(start_value, min_value, max_value), min_pos, max_pos)
-            end_pos = fraction_to_value(value_to_fraction(end_value, min_value, max_value), min_pos, max_pos)
-            
+            start_pos = fraction_to_value(
+                value_to_fraction(start_value, min_value, max_value), min_pos, max_pos
+            )
+            end_pos = fraction_to_value(
+                value_to_fraction(end_value, min_value, max_value), min_pos, max_pos
+            )
+
             if self.style == wx.SL_HORIZONTAL:
                 r_x = int(start_pos)
                 r_y = int(h / 2 - track_height / 4)
@@ -419,7 +423,7 @@ class MarkSlider(wx.Panel):
                 r_y = int(start_pos)
                 r_w = int(track_height / 2)
                 r_h = int(end_pos - start_pos)
-            
+
             dc.DrawRectangle(r_x, r_y, r_w, r_h)
 
         # 3. Draw thumb
@@ -520,7 +524,12 @@ class TestFrame(wx.Frame):
 
         # Custom Slider
         self.mark_slider = MarkSlider(
-            panel, value=200, minValue=0, maxValue=500, size=(-1, 300), style = wx.SL_VERTICAL
+            panel,
+            value=200,
+            minValue=0,
+            maxValue=500,
+            size=(-1, 300),
+            style=wx.SL_VERTICAL,
         )
         self.mark_slider.SetRange(100, 110)
         self.mark_slider.SetRanges([[200, 240], [300, 340]])
@@ -540,14 +549,12 @@ class TestFrame(wx.Frame):
         self.slider.Bind(wx.EVT_SCROLL, self.OnSliderScroll)
         self.mark_slider.Bind(wx.EVT_SLIDER, self.OnMarkSliderScroll)
 
-
     def OnSliderScroll(self, e):
 
         obj = e.GetEventObject()
         val = obj.GetValue()
 
         self.txt.SetLabel(str(val))
-
 
     def OnMarkSliderScroll(self, e):
         print("OnMarkSliderScroll")

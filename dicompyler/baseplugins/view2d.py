@@ -14,6 +14,7 @@ from PIL import Image
 Use as a Custom Widget.
 """
 
+
 class View2D(wx.Panel):
     """Plugin to display DICOM image, RT Structure, RT Dose in 2D."""
 

@@ -172,6 +172,7 @@ class LesionStatisticsPanel(wx.Panel):
         else:
             print("no lesions data")
 
+
 def run_LesionPanel():
     app = wx.App()
     frame = wx.Frame(None, -1, "run LesionPanel", size=(300, 200))

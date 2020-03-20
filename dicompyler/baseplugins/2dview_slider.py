@@ -4,17 +4,14 @@ logger = logging.getLogger("dicompyler.2dview")
 import wx
 from wx.xrc import XmlResource, XRCCTRL, XRCID
 from pubsub import pub
-from matplotlib import _cntr as cntr
-from matplotlib import __version__ as mplversion
-import numpy as np
 from dicompyler import guiutil, util
-from PIL import Image
 from dicompyler.baseplugins.view2d import View2D
 from dicompyler.mark_slider import MarkSlider
 
 """
 Later, it will be renamed to "2dview.py" when it's steady
 """
+
 
 def pluginProperties():
     """Properties of the plugin."""
@@ -40,7 +37,6 @@ def pluginLoader(parent):
     return panel2DView
 
 
-
 class Plugin2DViewSlider(wx.Panel):
     """Plugin to display DICOM image, RT Structure, RT Dose in 2D."""
 
@@ -61,7 +57,7 @@ class Plugin2DViewSlider(wx.Panel):
         self.res.AttachUnknownControl("2dviewPanel", self.view2d, self)
         self.slider = MarkSlider(self, style=wx.SL_VERTICAL)
         self.res.AttachUnknownControl("sliderPanel", self.slider, self)
-        
+
         # Bind interface events to the proper methods
         self.slider.Bind(wx.EVT_SLIDER, self.OnMarkSliderScroll)
 
@@ -69,8 +65,6 @@ class Plugin2DViewSlider(wx.Panel):
         pub.subscribe(self.OnUpdatePatient, "patient.updated.parsed_data")
         pub.subscribe(self.OnUpdateImage, "2dview.updated.image")
         pub.subscribe(self.OnUpdateLesion, "lesion.loaded.analysis")
-
-
 
     def OnDestroy(self, event):
         """Unbind to all events before the plugin is dÃƒÅ¸estroyed."""
@@ -88,11 +82,9 @@ class Plugin2DViewSlider(wx.Panel):
         self.slider.SetMin(min)
         self.slider.SetValue(min)
 
-
     def OnUpdateImage(self, msg):
         self.slider.SetValue(msg["number"])
 
-    
     def OnUpdateLesion(self, msg):
         if ("analysis" in msg) and ("lesions" in msg["analysis"]):
             lesions = msg["analysis"]["lesions"]
@@ -105,10 +97,7 @@ class Plugin2DViewSlider(wx.Panel):
         else:
             print("no lesions data")
 
-    
     def OnMarkSliderScroll(self, event):
         obj = event.GetEventObject()
         value = obj.GetValue()
-        pub.sendMessage(
-            "2dview.goto_slice", msg={"slice": value}
-        )
+        pub.sendMessage("2dview.goto_slice", msg={"slice": value})

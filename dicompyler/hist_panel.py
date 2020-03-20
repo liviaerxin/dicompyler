@@ -207,7 +207,6 @@ class HistPanel(wx.Panel):
         self.SetSizer(bSizer1)
         self.Layout()
 
-
         # Bind interface events to the proper methods
         self.Bind(wx.EVT_SPINCTRLDOUBLE, self.OnChangeCTRange, self.spinLeft)
         self.Bind(wx.EVT_SPINCTRLDOUBLE, self.OnChangeCTRange, self.spinRight)
@@ -219,7 +218,6 @@ class HistPanel(wx.Panel):
         """Unbind to all events before the window is destroyed."""
         print("Destory Histogram Panel")
         pub.unsubscribe(self.OnUpdateHistogram, "lesion.loaded.analysis")
-
 
     def plot_histogram_img(self, img: str):
         """Plot a histogram
@@ -338,18 +336,18 @@ class HistPanel(wx.Panel):
     def OnChangeCTRange(self, event):
         left = self.spinLeft.GetValue()
         right = self.spinRight.GetValue()
-        if (left > right):
+        if left > right:
             print("Warning: right must be larger than left!!")
             return
 
         if len(self.figure.axes) == 0:
             print("No Axes to Change")
             return
-        
+
         for ax in self.figure.axes:
             ax.set_xlim(left, right)
             ax.autoscale_view()
-        
+
         # redraw
         self.canvas.draw()
         self.canvas.Refresh()
@@ -374,12 +372,9 @@ class HistPanel(wx.Panel):
 
         if ("analysis" in msg) and ("histogram" in msg["analysis"]):
             data = msg["analysis"]["histogram"]
-            self.plot_histogram_line_by_line(
-                data["HU"], data["left"], data["right"]
-            )
+            self.plot_histogram_line_by_line(data["HU"], data["left"], data["right"])
         else:
             print("no histogram data")
-
 
         """Plot Single Histogram"""
         # Mock data

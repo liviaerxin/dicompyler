@@ -34,6 +34,7 @@ from dicompyler.hist_panel import HistPanel
 from dicompyler.lesion_statistics_panel import LesionStatisticsPanel
 from dicompyler.lung_statistics_panel import LungStatisticsPanel
 
+
 class MainFrame(wx.Frame):
     def __init__(self, parent, id, title, res):
 
@@ -149,7 +150,7 @@ class MainFrame(wx.Frame):
 
         self.lesionStatisticsPanel = LesionStatisticsPanel(self.notebookStatistics)
         self.notebookStatistics.AddPage(self.lesionStatisticsPanel, "Lesion Statistic")
-        
+
         self.lungStatisticsPanel = LungStatisticsPanel(self.notebookStatistics)
         self.notebookStatistics.AddPage(self.lungStatisticsPanel, "Whole Lung Analysis")
 
