@@ -167,8 +167,8 @@ class LesionStatisticsPanel(wx.Panel):
         #     data = json.load(f)["lesion_list"]
 
         if ("analysis" in msg) and ("lesions" in msg["analysis"]):
-            data = msg["analysis"]["lesions"]
-            self.update_list(data)
+            lesions = msg["analysis"]["lesions"]
+            self.update_list(lesions)
         else:
             print("no lesions data")
 

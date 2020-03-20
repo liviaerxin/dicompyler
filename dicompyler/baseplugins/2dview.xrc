@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<resource>
-  <object class="wxPanel" name="plugin2DView" subclass="2dview.plugin2DView">
-  </object>
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
+	<object class="wxPanel" name="plugin2DView" subclass="2dview.plugin2DView">
+		<style>wxTAB_TRAVERSAL</style>
+	</object>
 </resource>
