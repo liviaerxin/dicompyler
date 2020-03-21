@@ -5,47 +5,23 @@ import wx
 from wx.xrc import XmlResource, XRCCTRL, XRCID
 from pubsub import pub
 from dicompyler import guiutil, util
-from dicompyler.baseplugins.view2d import View2D
+from dicompyler.baseplugins.view2d import View2d
 from dicompyler.mark_slider import MarkSlider
 
+
 """
-Later, it will be renamed to "2dview.py" when it's steady
+Use as a Custom Widget.
 """
 
-
-def pluginProperties():
-    """Properties of the plugin."""
-
-    props = {}
-    props["name"] = "2D View"
-    props["description"] = "Display image, structure and dose data in 2D"
-    props["author"] = "Aditya Panchal"
-    props["version"] = "0.5.0"
-    props["plugin_type"] = "main"
-    props["plugin_version"] = 1
-    props["min_dicom"] = ["images"]
-    props["recommended_dicom"] = ["images", "rtss", "rtdose"]
-
-    return props
-
-
-def pluginLoader(parent):
-    """Function to load the plugin."""
-
-    panel2DView = Plugin2DViewSlider(parent)
-
-    return panel2DView
-
-
-class Plugin2DViewSlider(wx.Panel):
-    """Plugin to display DICOM image, RT Structure, RT Dose in 2D."""
+class View2dSlider(wx.Panel):
+    """Panel to display DICOM image in 2D with a slider."""
 
     def __init__(self, parent):
-        wx.Panel.__init__(self, parent)
+        super().__init__(parent)
 
         # Load the XRC file for our gui resources
-        self.res = XmlResource(util.GetBasePluginsPath("2dviewslider.xrc"))
-        self.res.LoadPanel(self, parent, "plugin2DViewSlider")
+        self.res = XmlResource(util.GetBasePluginsPath("view2d_slider.xrc"))
+        self.res.LoadPanel(self, parent, "view2dSliderPanel")
 
         self.Init()
 
@@ -53,13 +29,13 @@ class Plugin2DViewSlider(wx.Panel):
         """Method called after the panel has been initialized."""
 
         # Initialize the panel controls
-        self.view2d = View2D(self)
-        self.res.AttachUnknownControl("2dviewPanel", self.view2d, self)
+        self.view2d = View2d(self)
+        self.res.AttachUnknownControl("viewPanel", self.view2d, self)
         self.slider = MarkSlider(self, style=wx.SL_VERTICAL)
         self.res.AttachUnknownControl("sliderPanel", self.slider, self)
 
         # Bind interface events to the proper methods
-        self.slider.Bind(wx.EVT_SLIDER, self.OnMarkSliderScroll)
+        self.slider.Bind(wx.EVT_SLIDER, self.OnSliderScroll)
 
         # Set up pubsub
         pub.subscribe(self.OnUpdatePatient, "patient.updated.parsed_data")
@@ -68,6 +44,7 @@ class Plugin2DViewSlider(wx.Panel):
 
     def OnDestroy(self, event):
         """Unbind to all events before the plugin is dÃƒÅ¸estroyed."""
+        
         print("Destroy plugin2DView")
 
         pub.unsubscribe(self.OnUpdatePatient, "patient.updated.parsed_data")
@@ -76,6 +53,7 @@ class Plugin2DViewSlider(wx.Panel):
 
     def OnUpdatePatient(self, msg):
         """Update and load the patient data."""
+        
         max = len(msg["images"])
         min = 1
         self.slider.SetMax(max)
@@ -83,9 +61,13 @@ class Plugin2DViewSlider(wx.Panel):
         self.slider.SetValue(min)
 
     def OnUpdateImage(self, msg):
+        """Update the slider when 2d view update to a new image."""
+
         self.slider.SetValue(msg["number"])
 
     def OnUpdateLesion(self, msg):
+        """Update the slider range when 2d view update to a new image."""
+
         if ("analysis" in msg) and ("lesions" in msg["analysis"]):
             lesions = msg["analysis"]["lesions"]
             lesion_ranges = []
@@ -97,7 +79,38 @@ class Plugin2DViewSlider(wx.Panel):
         else:
             print("no lesions data")
 
-    def OnMarkSliderScroll(self, event):
+    def OnSliderScroll(self, event):
+        """slider value changed"""
+
         obj = event.GetEventObject()
         value = obj.GetValue()
         pub.sendMessage("2dview.goto_slice", msg={"slice": value})
+
+
+class TestFrame(wx.Frame):
+    def __init__(self, *args, **kw):
+        super().__init__(*args, **kw)
+
+        self.InitUI()
+
+    def InitUI(self):
+        panel = wx.Panel(self)
+        
+        hbox = wx.BoxSizer(orient=wx.HORIZONTAL)
+        
+        self.view2d_slider = View2dSlider(panel)
+        hbox.Add(self.view2d_slider, proportion=1, flag=wx.EXPAND | wx.ALL)
+
+        panel.SetSizer(hbox)
+
+        self.Centre()
+
+def main():
+    app = wx.App()
+    frame = TestFrame(None)
+    frame.Show()
+    app.MainLoop()
+
+
+if __name__ == "__main__":
+    main()

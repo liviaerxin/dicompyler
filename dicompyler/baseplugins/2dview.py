@@ -14,8 +14,8 @@ logger = logging.getLogger("dicompyler.2dview")
 import wx
 from wx.xrc import XmlResource, XRCCTRL, XRCID
 from pubsub import pub
-from dicompyler.baseplugins.view2d import View2D
-
+from dicompyler.baseplugins.view2d import View2d
+from dicompyler.baseplugins.view2d_slider import View2dSlider
 
 """
 Later, it will be depricated and replaced by "2dview_slider.py"
@@ -31,7 +31,7 @@ def pluginProperties():
     props["author"] = "Aditya Panchal"
     props["version"] = "0.5.0"
     props["plugin_type"] = "main"
-    props["plugin_version"] = None  # not loaded
+    props["plugin_version"] = 1
     props["min_dicom"] = ["images"]
     props["recommended_dicom"] = ["images", "rtss", "rtdose"]
 
@@ -41,11 +41,9 @@ def pluginProperties():
 def pluginLoader(parent):
     """Function to load the plugin."""
 
-    # Load the XRC file for our gui resources
-    # res = XmlResource(util.GetBasePluginsPath("2dview.xrc"))
+    # previous view2d without slider
+    #panelView2D = View2d(parent)
 
-    # panel2DView = res.LoadPanel(parent, "plugin2DView")
-    # panel2DView.Init(res)
-    panelView2D = View2D(parent)
-
+    # new view2d with a slider
+    panelView2D = View2dSlider(parent)
     return panelView2D

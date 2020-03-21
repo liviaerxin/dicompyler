@@ -15,21 +15,21 @@ Use as a Custom Widget.
 """
 
 
-class View2D(wx.Panel):
-    """Plugin to display DICOM image, RT Structure, RT Dose in 2D."""
+class View2d(wx.Panel):
+    """Panel to display DICOM image, RT Structure, RT Dose in 2D."""
 
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
 
         # Load the XRC file for our gui resources
-        res = XmlResource(util.GetBasePluginsPath("2dview.xrc"))
-        res.LoadPanel(self, parent, "plugin2DView")
+        res = XmlResource(util.GetBasePluginsPath("view2d.xrc"))
+        res.LoadPanel(self, parent, "view2dPanel")
 
         self.Init()
 
     def Init(self):
         """Method called after the panel has been initialized."""
-        print("Initialize plugin2DView")
+        print("Initialize View2d")
         # Bind ui events to the proper methods
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_SIZE, self.OnSize)
@@ -167,8 +167,8 @@ class View2D(wx.Panel):
     def OnGoToSlice(self, msg):
         """Goto a particular slice."""
         if "slice" in msg:
-            print(msg)
-            print(self)
+            print(f"Goto a particular slice. {msg}")
+            #print(self)
             gotonum: int = msg["slice"]
             if 1 <= gotonum <= len(self.images):
                 self.imagenum = gotonum
