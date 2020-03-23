@@ -19,7 +19,7 @@ class View2d(wx.Panel):
     """Panel to display DICOM image, RT Structure, RT Dose in 2D."""
 
     def __init__(self, parent):
-        wx.Panel.__init__(self, parent)
+        super().__init__()
 
         # Load the XRC file for our gui resources
         res = XmlResource(util.GetBasePluginsPath("view2d.xrc"))

@@ -18,7 +18,7 @@ class View2dSlider(wx.Panel):
     """Panel to display DICOM image in 2D with a slider."""
 
     def __init__(self, parent):
-        super().__init__(parent)
+        super().__init__()
 
         # Load the XRC file for our gui resources
         self.res = XmlResource(util.GetBasePluginsPath("view2d_slider.xrc"))

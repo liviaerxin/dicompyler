@@ -10,7 +10,7 @@ main_xrc_file = os.path.join(resources_dir, "main.xrc")
 
 class PanelGeneral(wx.Panel):
     def __init__(self, parent, *args, **kw):
-        wx.Panel.__init__(self, parent)
+        super().__init__()
 
         res = xrc.XmlResource(main_xrc_file)
         res.LoadPanel(self, parent, "panelGeneral")
@@ -18,56 +18,34 @@ class PanelGeneral(wx.Panel):
 
 class PanelWelcome(wx.Panel):
     def __init__(self, parent, *args, **kw):
-        wx.Panel.__init__(self, parent)
+        super().__init__()
+
         res = xrc.XmlResource(main_xrc_file)
         res.LoadPanel(self, parent, "panelWelcome")
-
-
-class PanelTest(wx.Panel):
-    def __init__(self, parent, *args, **kw):
-        wx.Panel.__init__(self, parent)
-        res = xrc.XmlResource(main_xrc_file)
-        res.LoadPanel(self, parent, "MyPanel9")
-        self.panel1 = xrc.XRCCTRL(self, "m_panel2")
-        self.notebook: wx.Notebook = xrc.XRCCTRL(self, "m_notebook5")
-        # self.notebook.DeletePage(0)
-
-
-class TestFrame(wx.Frame):
-    def __init__(self, parent, *args, **kw):
-        wx.Frame.__init__(self, parent, *args, **kw)
 
 
 """
 Test Show
 """
 
+class TestFrameGeneral(wx.Frame):
+    def __init__(self, parent, *args, **kw):
+        super().__init__(parent, *args, **kw)
 
-def show_PanelGeneral():
-    frame = wx.Frame(None)
-
-    panelGeneral = PanelGeneral(frame)
-
-    frame.Show()
+        self.panel = PanelGeneral(self) #! it does not show when using `panel = PanelGeneral(self)`  (c++ variable destroy)
 
 
-def show_PanelWelcome():
-    frame = wx.Frame(None)
+class TestFrameWelcome(wx.Frame):
+    def __init__(self, parent, *args, **kw):
+        super().__init__(parent, *args, **kw)
 
-    # panelWelcome = xrc.XmlResource(main_xrc_file).LoadPanel(frame, 'panelWelcome')
-    panelWelcome = PanelWelcome(frame)
-
-    frame.Show()
-
+        self.panel = PanelWelcome(self) #! it does not show when using `panel = PanelWelcome(self)`  (c++ variable destroy)
 
 if __name__ == "__main__":
     app = wx.App()
-    # show_PanelGeneral()
-    # show_PanelWelcome()
 
-    frame = wx.Frame(None)
-
-    PanelTest = PanelTest(frame)
+    #frame = TestFrameGeneral(None)
+    frame = TestFrameWelcome(None)
 
     frame.Show()
 
