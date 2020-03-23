@@ -48,14 +48,18 @@ Refer to viewer on market:
 - [ ] allow input of WC/WW
       add spin control to tool `2dview`'s tool?
 
-- [ ] add scroll bar to jump to instance
+- [x] add scroll bar to jump to instance
       lesion should be highlighted and with `representative_slice` as thumbnail (maybe upon hover)
 
 - [ ] generate side views from series
 
-- need to show Chinese? config matplot with Chinese font setting, title
+- [ ] need to show Chinese? config matplot with Chinese font setting, title
 
 - [ ] replace `print` with `logger`
+
+- [x] Integrate real algorithm into the system, also keep the mock algorithm  
+   For using real algorithm, it should put the algorithm folder `lung_ct_analysis_v1.1` in the `resources` folder. If not, it will use mock algorithm and mock data.  
+   Persist the analysis files in `data` folder for each `series`(distinguished by tag `SeriesInstanceUID`).  
 
 ## dicomplyer study
 

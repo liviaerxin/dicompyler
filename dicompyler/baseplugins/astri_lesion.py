@@ -7,11 +7,15 @@ from pubsub import pub
 from typing import List
 import json
 import numpy as np
-import os.path as path
+import os
 import pydicom
 import threading
 import time
 import wx
+import subprocess
+from typing import List
+from pathlib import Path
+import re
 
 
 def pluginProperties():
@@ -35,6 +39,32 @@ def pluginLoader(parent):
     print("Lesion Analysis Plugin Loaded")
     panelTest = pluginTest(parent)
     return panelTest
+
+
+def execute(cmd: List[str], cwd=None):
+    """Constantly print Subprocess output while process is running
+    
+    Arguments:
+        cmd {List[str]} -- [description]
+    
+    Keyword Arguments:
+        cwd {[type]} -- [description] (default: {None})
+    
+    Raises:
+        subprocess.CalledProcessError: [description]
+    
+    Yields:
+        [type] -- [description]
+    """
+    popen = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, universal_newlines=True, cwd=cwd
+    )
+    for stdout_line in iter(popen.stdout.readline, ""):
+        yield stdout_line
+    popen.stdout.close()
+    return_code = popen.wait()
+    if return_code:
+        raise subprocess.CalledProcessError(return_code, cmd)
 
 
 class pluginTest(wx.Panel):
@@ -72,11 +102,13 @@ class pluginTest(wx.Panel):
                 else:
                     print(f"unable to process the image: {type(image)}")
 
-        self.RunAnalysis(files)
+            series_uid = image.SeriesInstanceUID
+
+        self.RunAnalysis(files, series_uid)
 
         pub.unsubscribe(self.OnUpdatePatient, "patient.updated.raw_data")
 
-    def RunAnalysis(self, files: List[str]):
+    def RunAnalysis(self, files: List[str], series_uid: str = None):
         """Analyze the lesion with given DICOM files
 
         Arguments:
@@ -92,7 +124,7 @@ class pluginTest(wx.Panel):
         # Initialize and start the background analyzing thread
         self.t = threading.Thread(
             target=self.analyze_files_thread,
-            args=(files, dlgProgress.OnUpdateProgress),
+            args=(files, series_uid, dlgProgress.OnUpdateProgress),
         )
         self.t.start()
         # Show the progress dialog
@@ -111,30 +143,113 @@ class pluginTest(wx.Panel):
         """
         time.sleep(0.001)
 
-    def analyze_files_thread(self, files: List[str], progressFunc):
+    def analyze_files_thread(self, files: List[str], series_uid, progressFunc):
         length = len(files)
+        isMock = True
 
-        for i, file in enumerate(files):
-            wx.CallAfter(progressFunc, i, length, "Analyzing Lesion...")
+        # Analysis Start
+        wx.CallAfter(progressFunc, 0, 100, "Analyzing Lesion...")
 
-            # TODO: replace with real analyzing algorithm
-            self.mock_analyze_file(file)
+        # Analysis Process
+        # TODO: auto detect the new version
+        algorithm_dir = util.GetResourcePath("lung_ct_analysis_v1.1")
 
-        wx.CallAfter(progressFunc, length, length, "Done")
+        if os.path.isdir(algorithm_dir):
+            # Real algorithm
+            isMock = False
+            print(f"Use algorithm dir f{algorithm_dir} to analyze")
 
-        # Mock analysis result
-        result = None
-        with open(util.GetResourcePath("PA373_ST1_SE2.json")) as f:
-            result = json.load(f)
-            pub.sendMessage("lesion.loaded.analysis", msg={"analysis": result})
+            input_file = "./demo/input.json"
+            output_file = "/temp/output.json"
+            mask_file = "/temp/mask.npy"
 
-        # Mock lesion mask
-        if length == 307:
-            maskpath = util.GetResourcePath("PA373_ST1_SE2_mask.npy")
-        elif length == 59:
-            maskpath = util.GetResourcePath("TCGA-17-Z019.npy")
-        if path.isfile(maskpath):
-            mask: np.ndarray = np.load(maskpath)
-            print(f"Loaded mask[{maskpath}]: {mask.shape}")
-            # mask.shape: (Z, X, Y)
+            # prepare a folder to persist these files, so there's no need to re-generate these files again when running the same series
+            if series_uid is None:
+                # TODO: extract series uid from file
+                series_uid = "unknown"
+
+            series_analysis_dir = os.path.abspath(util.GetDataPath(series_uid))
+            input_file = os.path.join(series_analysis_dir, "input.json")
+            output_file = os.path.join(series_analysis_dir, "output.json")
+            mask_file = os.path.join(series_analysis_dir, "mask.npy")
+
+            if os.path.isfile(output_file) and os.path.isfile(mask_file):
+                # Use previously generated files
+                print(
+                    f"series[{series_uid}] has already generate output_file: {output_file} and mask_file: {mask_file}"
+                )
+            else:
+                # Generate new files
+                try:
+                    Path(series_analysis_dir).mkdir(parents=True, exist_ok=True)
+                    with open(input_file, "w", encoding="utf-8") as f:
+                        json.dump(files, f, ensure_ascii=False, indent=4)
+
+                    print(
+                        f"series[{series_uid}] is generating output_file: {output_file} and mask_file: {mask_file}"
+                    )
+
+                    for line in execute(
+                        [
+                            "python3.7",
+                            "release/process.cpython-37.pyc",
+                            input_file,
+                            "-o1",
+                            output_file,
+                            "-o2",
+                            mask_file,
+                        ],
+                        cwd=algorithm_dir,
+                    ):
+                        # for line in execute(["ls", "-la"]):
+                        print(line)
+                        match_obj = re.match(r"^progress\s(\d+)", line, re.M | re.I)
+                        if match_obj:
+                            progress = min(100, max(0, int(match_obj.group(1))))
+                            wx.CallAfter(
+                                progressFunc, progress, 100, "Analyzing Lesion..."
+                            )
+                except Exception as e:
+                    print(e)
+        else:
+            # Mock algorithm
+            print(f"Use mock algorithm to analyze")
+            for i, file in enumerate(files):
+                wx.CallAfter(progressFunc, int(i / length), 100, "Analyzing Lesion...")
+                self.mock_analyze_file(file)
+
+        # Analysis End
+        wx.CallAfter(progressFunc, 100, 100, "Done")
+
+        if isMock:
+            # Mock analysis result
+            print(f"Use mock result")
+            result = None
+            with open(util.GetResourcePath("PA373_ST1_SE2.json")) as f:
+                result = json.load(f)
+                pub.sendMessage("lesion.loaded.analysis", msg={"analysis": result})
+
+            # Mock lesion mask
+            if length == 307:
+                maskpath = util.GetResourcePath("PA373_ST1_SE2_mask.npy")
+            elif length == 59:
+                maskpath = util.GetResourcePath("TCGA-17-Z019.npy")
+            if os.path.isfile(maskpath):
+                mask: np.ndarray = np.load(maskpath)
+                print(f"Loaded mask[{maskpath}]: {mask.shape}")
+                # mask.shape: (Z, X, Y)
+                pub.sendMessage("lesion.loaded.mask", msg={"mask": mask})
+        else:
+            # Real result
+            print(
+                f"Use real result output_file: {output_file} and mask_file: {mask_file}"
+            )
+
+            # analysis result
+            with open(output_file) as f:
+                result = json.load(f)
+                pub.sendMessage("lesion.loaded.analysis", msg={"analysis": result})
+
+            # lesion mask
+            mask: np.ndarray = np.load(mask_file)
             pub.sendMessage("lesion.loaded.mask", msg={"mask": mask})

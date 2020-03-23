@@ -42,7 +42,7 @@ def pluginLoader(parent):
     """Function to load the plugin."""
 
     # previous view2d without slider
-    #panelView2D = View2d(parent)
+    # panelView2D = View2d(parent)
 
     # new view2d with a slider
     panelView2D = View2dSlider(parent)

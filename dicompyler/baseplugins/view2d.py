@@ -168,7 +168,7 @@ class View2d(wx.Panel):
         """Goto a particular slice."""
         if "slice" in msg:
             print(f"Goto a particular slice. {msg}")
-            #print(self)
+            # print(self)
             gotonum: int = msg["slice"]
             if 1 <= gotonum <= len(self.images):
                 self.imagenum = gotonum

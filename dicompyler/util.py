@@ -40,6 +40,15 @@ def GetBasePluginsPath(resource):
     return os.path.join((os.path.join(get_main_dir(), "baseplugins")), resource)
 
 
+def GetDataPath(resource):
+    """Return the specified item from the data folder."""
+
+    if main_is_frozen():
+        if platform() == "mac":
+            return os.path.join((os.path.join(get_main_dir(), "../Data")), resource)
+    return os.path.join((os.path.join(get_main_dir(), "data")), resource)
+
+
 # from http://www.py2exe.org/index.cgi/HowToDetermineIfRunningFromExe
 def main_is_frozen():
     return (

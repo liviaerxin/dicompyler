@@ -13,6 +13,7 @@ from dicompyler.mark_slider import MarkSlider
 Use as a Custom Widget.
 """
 
+
 class View2dSlider(wx.Panel):
     """Panel to display DICOM image in 2D with a slider."""
 
@@ -44,7 +45,7 @@ class View2dSlider(wx.Panel):
 
     def OnDestroy(self, event):
         """Unbind to all events before the plugin is dÃƒÅ¸estroyed."""
-        
+
         print("Destroy plugin2DView")
 
         pub.unsubscribe(self.OnUpdatePatient, "patient.updated.parsed_data")
@@ -53,7 +54,7 @@ class View2dSlider(wx.Panel):
 
     def OnUpdatePatient(self, msg):
         """Update and load the patient data."""
-        
+
         max = len(msg["images"])
         min = 1
         self.slider.SetMax(max)
@@ -95,15 +96,16 @@ class TestFrame(wx.Frame):
 
     def InitUI(self):
         panel = wx.Panel(self)
-        
+
         hbox = wx.BoxSizer(orient=wx.HORIZONTAL)
-        
+
         self.view2d_slider = View2dSlider(panel)
         hbox.Add(self.view2d_slider, proportion=1, flag=wx.EXPAND | wx.ALL)
 
         panel.SetSizer(hbox)
 
         self.Centre()
+
 
 def main():
     app = wx.App()
