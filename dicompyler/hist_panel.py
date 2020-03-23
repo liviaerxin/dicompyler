@@ -292,11 +292,11 @@ class HistPanel(wx.Panel):
         ax_right_lung.set_yticklabels([])
 
         # 1.3 plot hist
-        ax_right_lung.hist(bins[:-1], bins=bins, weights=counts_right, label="Present")
+        ax_right_lung.hist(bins, bins=bins, weights=counts_right, label="Present")
 
         # 1.4 plot ref hist line
         ax_right_lung.plot(
-            Ref_Lung_Hist["HU"][:-1], Ref_Lung_Hist["right"], "r", label="Reference"
+            Ref_Lung_Hist["HU"], Ref_Lung_Hist["right"], "r", label="Reference"
         )
         ax_right_lung.legend()
 
@@ -316,11 +316,11 @@ class HistPanel(wx.Panel):
         ax_left_lung.set_yticklabels([])
 
         # 2.3 plot hist
-        ax_left_lung.hist(bins[:-1], bins=bins, weights=counts_right, label="Present")
+        ax_left_lung.hist(bins, bins=bins, weights=counts_right, label="Present")
 
         # 2.4 plot ref hist line
         ax_left_lung.plot(
-            Ref_Lung_Hist["HU"][:-1], Ref_Lung_Hist["left"], "r", label="Reference"
+            Ref_Lung_Hist["HU"], Ref_Lung_Hist["left"], "r", label="Reference"
         )
         ax_left_lung.legend()
 
