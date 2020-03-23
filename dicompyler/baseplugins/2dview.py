@@ -40,11 +40,7 @@ def pluginProperties():
 def pluginLoader(parent):
     """Function to load the plugin."""
 
-    # Load the XRC file for our gui resources
-    res = XmlResource(util.GetBasePluginsPath("2dview.xrc"))
-
-    panel2DView = res.LoadPanel(parent, "plugin2DView")
-    panel2DView.Init(res)
+    panel2DView = plugin2DView(parent)
 
     return panel2DView
 
@@ -52,8 +48,14 @@ def pluginLoader(parent):
 class plugin2DView(wx.Panel):
     """Plugin to display DICOM image, RT Structure, RT Dose in 2D."""
 
-    def __init__(self):
-        wx.Panel.__init__(self)
+    def __init__(self, parent):
+        super().__init__()
+        
+        # Load the XRC file for our gui resources
+        res = XmlResource(util.GetBasePluginsPath("2dview.xrc"))
+        res.LoadPanel(self, parent, "plugin2DView")
+
+        self.Init(res)
 
     def Init(self, res):
         """Method called after the panel has been initialized."""

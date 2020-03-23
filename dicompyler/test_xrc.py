@@ -9,66 +9,61 @@ main_xrc_file = os.path.join(resources_dir, "main.xrc")
 
 
 class PanelGeneral(wx.Panel):
-    def __init__(self, parent, *args, **kw):
-        wx.Panel.__init__(self, parent)
+    def __init__(self, parent):
+        super().__init__()
 
         res = xrc.XmlResource(main_xrc_file)
         res.LoadPanel(self, parent, "panelGeneral")
 
 
 class PanelWelcome(wx.Panel):
-    def __init__(self, parent, *args, **kw):
-        wx.Panel.__init__(self, parent)
+    def __init__(self, parent):
+        super().__init__()
         res = xrc.XmlResource(main_xrc_file)
+        print(parent)
         res.LoadPanel(self, parent, "panelWelcome")
-
-
-class PanelTest(wx.Panel):
-    def __init__(self, parent, *args, **kw):
-        wx.Panel.__init__(self, parent)
-        res = xrc.XmlResource(main_xrc_file)
-        res.LoadPanel(self, parent, "MyPanel9")
-        self.panel1 = xrc.XRCCTRL(self, "m_panel2")
-        self.notebook: wx.Notebook = xrc.XRCCTRL(self, "m_notebook5")
-        # self.notebook.DeletePage(0)
-
-
-class TestFrame(wx.Frame):
-    def __init__(self, parent, *args, **kw):
-        wx.Frame.__init__(self, parent, *args, **kw)
-
+        print(parent.GetChildren())
 
 """
 Test Show
 """
 
 
-def show_PanelGeneral():
-    frame = wx.Frame(None)
+class TestFramePanelGeneral(wx.Frame):
+    def __init__(self, parent=None, *args, **kw):
+        super().__init__(parent, *args, **kw)
 
-    panelGeneral = PanelGeneral(frame)
+        sizer = wx.BoxSizer()
+        
+        self.panelGeneral = PanelGeneral(self) # !it does not show when using `panelGeneral = PanelGeneral(self)`  (c++ variable destroy?)
+        sizer.Add(panelGeneral)
 
-    frame.Show()
-
-
-def show_PanelWelcome():
-    frame = wx.Frame(None)
-
-    # panelWelcome = xrc.XmlResource(main_xrc_file).LoadPanel(frame, 'panelWelcome')
-    panelWelcome = PanelWelcome(frame)
-
-    frame.Show()
+        self.SetSizer(sizer)
 
 
-if __name__ == "__main__":
+
+class TestFramePanelWelcome(wx.Frame):
+    def __init__(self, parent=None):
+        super().__init__(parent=None, title="xxxx")
+
+        self.panelWelcome = PanelWelcome(self) # !it does not show when using `panelWelcome = PanelWelcome(self)`
+
+
+def main():
     app = wx.App()
-    # show_PanelGeneral()
-    # show_PanelWelcome()
-
-    frame = wx.Frame(None)
-
-    PanelTest = PanelTest(frame)
-
+    
+    #frame = TestFramePanelGeneral(title="xxxx")
+    
+    
+    frame = TestFramePanelWelcome(None)
+    
+    #frame = wx.Frame(None)
+    #panelWelcome = PanelWelcome(frame) # !it does not show when using `PanelWelcome(frame)`
+    
+    
     frame.Show()
 
     app.MainLoop()
+
+if __name__ == "__main__":
+    main()
