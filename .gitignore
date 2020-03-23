@@ -59,3 +59,4 @@ target/
 Pipfile.lock
 .vscode/
 *.npy
+dicompyler/resources/lung_ct_analysis_*/
