@@ -5,6 +5,8 @@ from pubsub import pub
 
 import matplotlib as mpl
 
+mpl.use("WXAgg")
+
 import matplotlib.image as mpimg
 from matplotlib.backends.backend_wxagg import (
     FigureCanvasWxAgg as FigureCanvas,
