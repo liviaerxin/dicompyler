@@ -151,12 +151,24 @@ class pluginTest(wx.Panel):
         wx.CallAfter(progressFunc, 0, 100, "Analyzing Lesion...")
 
         # Analysis Process
-        # TODO: auto detect the new version
-        algorithm_dir = util.GetResourcePath("lung_ct_analysis_v1.1")
 
-        if os.path.isdir(algorithm_dir):
-            # Real algorithm
+        # all folders immediately under `resources` folder
+        all_dirs = next(os.walk(util.GetResourcePath(".")))[1]
+        algo_dirs = []
+        for dir in all_dirs:
+            if dir.startswith("lung_ct_analysis_v"):
+                algo_dirs.append(dir)
+        
+        # auto detect the new version
+        algo_dirs.sort(reverse=True)
+        algorithm_dir = util.GetResourcePath(algo_dirs[0]) if len(algo_dirs) > 0 else None
+
+        if algorithm_dir:
             isMock = False
+        
+
+        if not isMock:
+            # Real algorithm
             print(f"Use algorithm dir f{algorithm_dir} to analyze")
 
             input_file = "./demo/input.json"
@@ -201,6 +213,7 @@ class pluginTest(wx.Panel):
                         ],
                         cwd=algorithm_dir,
                     ):
+                        #TODO: extract more progress data
                         # for line in execute(["ls", "-la"]):
                         print(line)
                         match_obj = re.match(r"^progress\s(\d+)", line, re.M | re.I)
