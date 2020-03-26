@@ -224,6 +224,8 @@ class pluginTest(wx.Panel):
                             )
                 except Exception as e:
                     print(e)
+                    print(f"failed to generate analysis result!")
+                    return
         else:
             # Mock algorithm
             print(f"Use mock algorithm to analyze")
