@@ -35,6 +35,9 @@ class View2dSlider(wx.Panel):
         self.slider = MarkSlider(self, style=wx.SL_VERTICAL)
         self.res.AttachUnknownControl("sliderPanel", self.slider, self)
 
+        # expose `View2d` plugin attributes
+        self.tools = self.view2d.tools
+
         # Bind interface events to the proper methods
         self.slider.Bind(wx.EVT_SLIDER, self.OnSliderScroll)
 
