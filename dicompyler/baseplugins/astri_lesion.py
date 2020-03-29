@@ -43,16 +43,16 @@ def pluginLoader(parent):
 
 def execute(cmd: List[str], cwd=None):
     """Constantly print Subprocess output while process is running
-    
+
     Arguments:
         cmd {List[str]} -- [description]
-    
+
     Keyword Arguments:
         cwd {[type]} -- [description] (default: {None})
-    
+
     Raises:
         subprocess.CalledProcessError: [description]
-    
+
     Yields:
         [type] -- [description]
     """
@@ -158,14 +158,18 @@ class pluginTest(wx.Panel):
         for dir in all_dirs:
             if dir.startswith("lung_ct_analysis_v"):
                 algo_dirs.append(dir)
-        
+
         # auto detect the new version
         algo_dirs.sort(reverse=True)
-        algorithm_dir = util.GetResourcePath(algo_dirs[0]) if len(algo_dirs) > 0 else None
+        algorithm_dir = (
+            util.GetResourcePath(algo_dirs[0]) if len(algo_dirs) > 0 else None
+        )
 
         if algorithm_dir:
             isMock = False
-        
+
+        # DEV: force mock
+        # isMock = True
 
         if not isMock:
             # Real algorithm
@@ -213,7 +217,7 @@ class pluginTest(wx.Panel):
                         ],
                         cwd=algorithm_dir,
                     ):
-                        #TODO: extract more progress data
+                        # TODO: extract more progress data
                         # for line in execute(["ls", "-la"]):
                         print(line)
                         match_obj = re.match(r"^progress\s(\d+)", line, re.M | re.I)

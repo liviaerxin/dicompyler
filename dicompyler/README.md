@@ -43,23 +43,30 @@ Refer to viewer on market:
       load `.npy` from resources (not in git tree)
       use Image Position Patient (ignoring head/feet first as that info is not always available)
 
-- [ ] add axes label (L/R/A/P) to `2dview`
-
-- [ ] allow input of WC/WW
-      add spin control to tool `2dview`'s tool?
-
 - [x] add scroll bar to jump to instance
       lesion should be highlighted and with `representative_slice` as thumbnail (maybe upon hover)
 
-- [ ] generate side views from series
-
-- [ ] need to show Chinese? config matplot with Chinese font setting, title
-
-- [ ] replace `print` with `logger`
-
 - [x] Integrate real algorithm into the system, also keep the mock algorithm  
-   For using real algorithm, it should put the algorithm folder `lung_ct_analysis_v1.1` in the `resources` folder. If not, it will use mock algorithm and mock data.  
-   Persist the analysis files in `data` folder for each `series`(distinguished by tag `SeriesInstanceUID`).  
+       For using real algorithm, it should put the algorithm folder `lung_ct_analysis_v1.1` in the `resources` folder. If not, it will use mock algorithm and mock data.  
+       Persist the analysis files in `data` folder for each `series`(distinguished by tag `SeriesInstanceUID`).
+
+- [ ] Tool bar button not shown if loading `View2dSlider`
+- [ ] Rename title to "CT Image Analyser"
+- [ ] ASTRI logo on toolbar
+- [ ] Welcome screen
+      use ASTRI logo
+      show "CT Image Analyser"
+- [ ] Make scroll bar stand out more
+- [ ] add orientation label (L/R/A/P) to `2dview`
+- [ ] Dark theme
+- [ ] Run algorithm in background
+      show progress in status bar?
+
+* [ ] allow input of WC/WW
+      add spin control to tool `2dview`'s tool?
+* [ ] Disable pan on 1:1 or if image < screen size
+* [ ] generate other planes' views from series
+* [ ] replace `print` with `logger`
 
 ## dicomplyer study
 
